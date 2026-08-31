@@ -1,0 +1,50 @@
+{
+  "name": "@portfolio/client",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3000",
+    "prebuild": "node scripts/generateSitemap.mjs",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.4.2",
+    "@portfolio/shared": "*",
+    "@portfolio/types": "*",
+    "@radix-ui/react-popover": "^1.1.23",
+    "@tanstack/react-query": "^5.39.0",
+    "dompurify": "^3.4.12",
+    "framer-motion": "^12.42.2",
+    "lucide-react": "^0.378.0",
+    "marked": "^12.0.2",
+    "prism-react-renderer": "^2.4.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-helmet-async": "^3.0.0",
+    "react-hook-form": "^7.51.5",
+    "react-router-dom": "^6.23.1",
+    "recharts": "^3.10.0",
+    "zod": "^3.23.8",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.5",
+    "@testing-library/react": "^15.0.7",
+    "@types/dompurify": "^3.0.5",
+    "@types/marked": "^4.3.2",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "autoprefixer": "^10.4.19",
+    "jsdom": "^24.0.0",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11",
+    "vitest": "^1.6.0"
+  }
+}

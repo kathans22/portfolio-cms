@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme applies site-wide via the .dark class on <html>, but the admin panel (AdminLayout)
+   always renders its own explicit dark background regardless — it isn't part of the public
+   dark/light toggle, so it's visually unaffected by any of this. */
+@layer base {
+  body {
+    @apply bg-white text-slate-700 dark:text-slate-200 font-body antialiased transition-colors duration-200;
+  }
+  .dark body {
+    background-color: #0a0c10;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading text-slate-900 dark:text-white;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-slate-100 dark:bg-[#0a0c10];
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-[#161b26];
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6366f1;
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, #6366f1, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* These live in @layer components so Tailwind emits them *before* the utilities layer.
+   Defined outside a layer they land after it, and their `w-full` silently beats a
+   `w-auto` on the same element — which is why filter selects rendered full-width. */
+@layer components {
+
+/* Input Fields class — admin panel only, deliberately dark-only (see note above) */
+.input-field {
+  @apply w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-white outline-none focus:border-indigo-500 transition-colors placeholder:text-slate-600 text-sm;
+}
+
+/* Public-facing form fields — theme-aware */
+.form-input {
+  @apply w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-900 dark:text-white outline-none focus:border-indigo-500 transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-600 text-sm;
+}
+
+}
+
+/* Sidebar Custom class — admin panel only, deliberately dark-only */
+.nav-btn {
+  @apply flex items-center gap-3 px-4 py-2.5 w-full rounded-md text-slate-400 font-medium text-sm hover:bg-slate-800 hover:text-white transition-all text-left;
+}
+.nav-btn.active {
+  @apply bg-indigo-950/40 text-indigo-400 font-semibold;
+}
+
+/* Markdown parsing typography — public pages, theme-aware */
+.blog-content h2, .blog-content h3, .project-content h2, .project-content h3,
+.prose-content h2, .prose-content h3 {
+  @apply text-xl font-bold mt-6 mb-3 text-slate-900 dark:text-white;
+}
+.blog-content p, .blog-content pre, .project-content p, .prose-content p {
+  @apply mb-4 text-slate-600 dark:text-slate-300 leading-relaxed text-sm;
+}
+.blog-content a, .project-content a, .prose-content a {
+  @apply text-indigo-600 dark:text-indigo-400 underline underline-offset-2;
+}
+.blog-content code, .project-content code, .prose-content code {
+  @apply bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm;
+}
+.blog-content pre, .project-content pre, .prose-content pre {
+  @apply bg-slate-50 dark:bg-slate-900 p-4 rounded-lg overflow-x-auto my-4;
+}
+.blog-content pre code, .project-content pre code, .prose-content pre code {
+  @apply bg-transparent p-0 text-xs;
+}

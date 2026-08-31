@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    {
+      "comment": "sitemap.xml is generated on request by the API, because admin-created routes can appear after the last deploy. Crawlers look for it on the site's own origin, so proxy it here. Replace the destination host with your deployed API URL.",
+      "source": "/sitemap.xml",
+      "destination": "https://your-api.onrender.com/api/v1/sitemap.xml"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
