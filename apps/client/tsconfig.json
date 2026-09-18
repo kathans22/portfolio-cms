@@ -7,6 +7,10 @@
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "typeRoots": ["../../node_modules/@types"],
+    "paths": {
+      "@portfolio/shared": ["../../packages/shared/src/index.ts"],
+      "@portfolio/types": ["../../packages/types/src/index.ts"]
+    },
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
