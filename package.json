@@ -20,6 +20,7 @@
     "pretest": "npm run build:packages",
     "test": "npm run test --workspaces --if-present",
     "lint": "eslint .",
+    "pretypecheck": "npm run build:packages",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },
   "devDependencies": {
