@@ -6,15 +6,17 @@ import { testimonialSchema, TestimonialInput } from '@portfolio/shared';
 import type { Testimonial } from '@portfolio/types';
 import { apiFetch } from '../../lib/api';
 import { ImageUploadField } from '../../components/admin/ImageUploadField';
-import { Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Check, Clock } from 'lucide-react';
 
 export default function TestimonialsManager() {
   const queryClient = useQueryClient();
   const [currentModal, setCurrentModal] = useState<{ mode: 'add' | 'edit'; item?: Testimonial } | null>(null);
 
+  // '/testimonials/all', not '/testimonials': the public route now filters PENDING
+  // out, so the moderation queue would always look empty on the plain endpoint.
   const { data: testimonials } = useQuery<Testimonial[]>({
     queryKey: ['adminTestimonials'],
-    queryFn: async () => (await apiFetch('/testimonials')).json(),
+    queryFn: async () => (await apiFetch('/testimonials/all')).json(),
   });
 
   const { register, handleSubmit, control, reset, formState: { errors } } = useForm<TestimonialInput>({
@@ -54,7 +56,19 @@ export default function TestimonialsManager() {
     setCurrentModal({ mode: 'edit', item });
   };
 
-  const sorted = [...(testimonials || [])].sort((a, b) => a.order - b.order);
+  const approveMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiFetch(`/testimonials/${id}/approve`, { method: 'PATCH' });
+      if (!res.ok) throw new Error('Failed to approve testimonial');
+      return res.json();
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['adminTestimonials'] }),
+    onError: (err: Error) => alert(err.message),
+  });
+
+  const all = testimonials || [];
+  const pending = all.filter((t) => t.status === 'PENDING');
+  const sorted = all.filter((t) => t.status !== 'PENDING').sort((a, b) => a.order - b.order);
 
   return (
     <div className="space-y-6 text-slate-100">
@@ -67,6 +81,48 @@ export default function TestimonialsManager() {
           <Plus size={16} /> Add Testimonial
         </button>
       </header>
+
+      {/* Moderation queue — visitor submissions, invisible on the site until approved. */}
+      {pending.length > 0 && (
+        <section className="rounded-xl border border-amber-500/30 bg-amber-500/[0.06] p-5">
+          <h2 className="mb-1 flex items-center gap-2 text-sm font-bold text-amber-300">
+            <Clock size={15} /> Awaiting review ({pending.length})
+          </h2>
+          <p className="mb-5 text-xs text-slate-400">
+            Submitted from the public site. Nothing here is visible to visitors yet.
+          </p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {pending.map((t) => (
+              <div key={t.id} className="rounded-lg border border-slate-800 bg-slate-900 p-5">
+                <p className="mb-4 text-sm italic text-slate-300">&quot;{t.quote}&quot;</p>
+                <p className="text-sm font-bold text-white">{t.name}</p>
+                <p className="text-xs text-slate-500">
+                  {t.role}
+                  {t.company ? ` at ${t.company}` : ''}
+                </p>
+                {t.email && <p className="mt-1 font-mono text-[11px] text-slate-500">{t.email}</p>}
+                <div className="mt-4 flex gap-2 border-t border-slate-800 pt-4">
+                  <button
+                    onClick={() => approveMutation.mutate(t.id)}
+                    disabled={approveMutation.isPending}
+                    className="flex items-center gap-1.5 rounded bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-500 disabled:opacity-60"
+                  >
+                    <Check size={13} /> Approve &amp; publish
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (confirm(`Reject and delete the submission from "${t.name}"?`)) deleteMutation.mutate(t.id);
+                    }}
+                    className="flex items-center gap-1.5 rounded bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 hover:text-red-300"
+                  >
+                    <Trash2 size={13} /> Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {sorted.map((t) => (
