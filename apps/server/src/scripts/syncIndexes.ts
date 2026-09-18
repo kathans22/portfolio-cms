@@ -33,10 +33,11 @@ import { Certification } from '../modules/certifications/certification.model';
 import { Experience } from '../modules/experience/experience.model';
 import { Education } from '../modules/education/education.model';
 import { Testimonial } from '../modules/testimonials/testimonial.model';
+import { Resume } from '../modules/resume/resume.model';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const MODELS: Model<any>[] = [
-  Page, Project, BlogPost, Skill, Certification, Experience, Education, Testimonial,
+  Page, Project, BlogPost, Skill, Certification, Experience, Education, Testimonial, Resume,
 ];
 
 interface IndexInfo {

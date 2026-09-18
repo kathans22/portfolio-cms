@@ -33,10 +33,14 @@ import messagesRouter from './modules/messages/routes';
 import contactRouter from './modules/messages/contactRoutes';
 import mediaRouter from './modules/media/routes';
 import analyticsRouter from './modules/analytics/routes';
+import resumeRouter from './modules/resume/routes';
+import adminResumeRouter from './modules/resume/adminRoutes';
+import profilePhotoRouter from './modules/profilePhoto/routes';
 
 import { errorHandler } from './middleware/errorHandler';
 import { rateLimiter } from './middleware/rateLimiter';
 import { connectDB, pingDB } from './config/db';
+import { UPLOADS_DIR } from './config/paths';
 import { initSentry, captureException } from './config/sentry';
 import { logger } from './utils/logger';
 
@@ -86,11 +90,11 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(cookieParser());
 app.use(morgan('dev'));
 
-// Static files routing for uploads
-// Uploads directory sits at the root folder level
-const uploadsPath = path.join(__dirname, '../../../../uploads');
-app.use('/uploads', express.static(uploadsPath));
-logger.info({ uploadsPath }, 'Serving uploads statically');
+// Static files routing for locally-stored uploads (the fallback when Cloudinary
+// isn't configured). Same directory the media/resume upload routes write to — see
+// config/paths.ts.
+app.use('/uploads', express.static(UPLOADS_DIR));
+logger.info({ uploadsPath: UPLOADS_DIR }, 'Serving uploads statically');
 
 // Register API modular routes — all under /api/v1 per the REST design
 app.use('/api/v1/auth', authRouter);
@@ -113,6 +117,9 @@ app.use('/api/v1/contact', contactRouter);
 app.use('/api/v1/messages', messagesRouter);
 app.use('/api/v1/media', mediaRouter);
 app.use('/api/v1/analytics', analyticsRouter);
+app.use('/api/v1/resume', resumeRouter);
+app.use('/api/v1/admin/resume', adminResumeRouter);
+app.use('/api/v1/profile-photo', profilePhotoRouter);
 
 // Health check endpoint — does a real MongoDB round-trip (not just a readyState
 // check) so it doubles as a keep-alive ping for a free-tier Atlas cluster, and Render
