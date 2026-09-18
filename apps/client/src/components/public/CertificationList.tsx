@@ -28,7 +28,7 @@ export function CertificationList({ layoutVariant = 'compact', limit = 6 }: Cert
   if (layoutVariant !== 'compact') return null;
 
   return (
-    <section aria-labelledby="home-certifications" className="max-w-6xl mx-auto px-6 py-10 border-t border-slate-200 dark:border-slate-900">
+    <section aria-labelledby="home-certifications" className="container-wide py-10 border-t border-slate-200 dark:border-slate-900">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <h2 id="home-certifications" className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
           Certified by

@@ -27,9 +27,9 @@ const PADDING_Y: Record<StyleOptions['paddingY'], string> = {
 };
 
 const MAX_WIDTH: Record<StyleOptions['maxWidth'], string> = {
-  narrow: 'max-w-3xl',
-  default: 'max-w-5xl',
-  wide: 'max-w-7xl',
+  narrow: 'max-w-4xl',
+  default: 'max-w-7xl',
+  wide: 'max-w-[96rem]',
   full: 'max-w-none',
 };
 
@@ -75,7 +75,7 @@ export function sectionStyles(options?: Partial<StyleOptions>): SectionClasses {
     ]
       .filter(Boolean)
       .join(' '),
-    container: [MAX_WIDTH[o.maxWidth] ?? MAX_WIDTH.default, 'mx-auto px-6', ALIGNMENT[o.alignment] ?? ALIGNMENT.left]
+    container: [MAX_WIDTH[o.maxWidth] ?? MAX_WIDTH.default, 'mx-auto px-5 sm:px-8 lg:px-12', ALIGNMENT[o.alignment] ?? ALIGNMENT.left]
       .filter(Boolean)
       .join(' '),
     grid: `grid gap-6 ${COLUMNS[o.columns] ?? COLUMNS[3]}`,

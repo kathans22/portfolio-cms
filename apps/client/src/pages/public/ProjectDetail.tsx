@@ -52,7 +52,7 @@ export default function ProjectDetail() {
   const hasBlocks = Array.isArray(project.contentBlocks) && project.contentBlocks.length > 0;
 
   return (
-    <article className="max-w-4xl mx-auto px-6 pt-32 pb-24 text-slate-700 dark:text-slate-100 min-h-screen">
+    <article className="max-w-5xl mx-auto px-6 sm:px-8 pt-32 pb-24 text-slate-700 dark:text-slate-100 min-h-screen">
       <Seo
         title={project.metaTitle || project.title}
         description={project.metaDescription || project.summary}

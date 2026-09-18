@@ -6,15 +6,28 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { contactSchema, ContactInput } from '@portfolio/shared';
 import type { Project, Skill, Testimonial, BlogPost } from '@portfolio/types';
-import { SkillCertificationBadge } from '../../components/public/SkillCertificationBadge';
 import { CertificationList } from '../../components/public/CertificationList';
+import { Hero } from '../../components/public/Hero';
+import { CoreTechnology } from '../../components/public/CoreTechnology';
+import { ProjectShowcase } from '../../components/public/ProjectShowcase';
+import { TestimonialsSection } from '../../components/public/TestimonialsSection';
 import { apiFetch } from '../../lib/api';
 import { Seo } from '../../components/ui/Seo';
 import { useToast } from '../../hooks/useToast';
 import {
-  Award, Mail, MapPin,
-  MessageSquare, Github, ExternalLink, AlertCircle
+  Mail, MapPin,
+  AlertCircle
 } from 'lucide-react';
+
+// Small editorial kicker used above each section heading.
+function Kicker({ children }: { index?: string; children: React.ReactNode }) {
+  return (
+    <span className="kicker flex items-center gap-2.5">
+      <span className="h-px w-8 bg-indigo-400/60 dark:bg-indigo-500/50" />
+      {children}
+    </span>
+  );
+}
 
 const fadeInUp = {
   initial: { opacity: 0, y: 24 },
@@ -108,173 +121,52 @@ export default function Home() {
 
   if (projectsLoading) {
     return (
-      <div className="flex flex-col justify-center items-center h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mb-4" role="status" aria-label="Loading" />
-        <p className="font-heading text-lg">Loading Portfolio Showcase...</p>
+      <div className="flex flex-col justify-center items-center h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white">
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-200 dark:border-slate-800 border-t-indigo-500 mb-4" role="status" aria-label="Loading" />
+        <p className="font-mono text-xs uppercase tracking-[0.3em] text-slate-400">loading</p>
       </div>
     );
   }
 
-  const skillsByCategory = skills?.reduce((acc: Record<string, Skill[]>, skill) => {
-    if (!acc[skill.category]) acc[skill.category] = [];
-    acc[skill.category].push(skill);
-    return acc;
-  }, {}) || {};
 
   return (
     <div className="relative overflow-hidden min-h-screen text-slate-700 dark:text-slate-100 pb-20">
       <Seo title="Kathan — Portfolio" path="/" personSchema />
 
-      {/* Dynamic Background Glows */}
-      <div className="absolute top-[10%] left-[-100px] w-96 h-96 rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
-      <div className="absolute top-[40%] right-[-100px] w-96 h-96 rounded-full bg-emerald-500/10 blur-[120px] pointer-events-none" />
-
-      {/* Hero Section */}
-      <section className="max-w-6xl mx-auto px-6 pt-32 pb-24 md:pt-40">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <span className="text-indigo-600 dark:text-indigo-400 font-semibold tracking-wider text-sm uppercase mb-4 block">
-              Full-Stack Developer & Architect
-            </span>
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight text-slate-900 dark:text-white">
-              Hi, I&apos;m <span className="text-gradient">Kathan</span>
-            </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-lg md:text-xl mb-8 max-w-xl leading-relaxed">
-              I build production-grade TypeScript applications, responsive user interfaces, and robust server architectures across software, AI, and data engineering.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link to="/contact" className="px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow-lg hover:shadow-indigo-500/20 transition-all">
-                Let&apos;s Work Together
-              </Link>
-              <Link to="/projects" className="px-6 py-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold border border-slate-200 dark:border-slate-700 transition-colors">
-                View My Projects
-              </Link>
-            </div>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="flex justify-center"
-          >
-            <div className="w-80 h-80 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-2xl float-animation">
-              <img
-                src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80"
-                alt="Developer workspace with multiple monitors showing code"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      <Hero />
 
       {/* Credentials sit high on the page: recruiters scan the home page first, and
           third-party validation shouldn't be three routes deep. */}
       <CertificationList layoutVariant="compact" limit={6} />
 
       {/* About blurb */}
-      <motion.section {...fadeInUp} className="max-w-4xl mx-auto px-6 py-16 border-t border-slate-200 dark:border-slate-900 text-center">
-        <p className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed">
-          Over 6+ years I&apos;ve engineered server frameworks for analytics platforms, scaled document-oriented database structures, and built interactive editor interfaces — across software development, AI engineering, and data engineering.
-          {' '}
-          <Link to="/about" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-semibold whitespace-nowrap">
-            More about me &rarr;
-          </Link>
+      <motion.section {...fadeInUp} className="container-wide py-20 border-t border-slate-200 dark:border-slate-900">
+        <p className="max-w-5xl text-xl md:text-3xl leading-relaxed text-slate-700 dark:text-slate-200 font-heading font-medium tracking-tight">
+          I build enterprise ERP platforms and multi-tenant commerce systems — one of them
+          carrying 1.4M+ orders and 30,000+ products — and the interfaces people actually
+          use to run them.
         </p>
+        <Link to="/about" className="mt-6 inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-indigo-600 dark:text-indigo-400 hover:gap-2.5 transition-all">
+          More about me &rarr;
+        </Link>
       </motion.section>
 
-      {/* Projects list */}
-      <motion.section {...fadeInUp} id="projects" className="max-w-6xl mx-auto px-6 py-20 border-t border-slate-200 dark:border-slate-900">
-        <div className="flex justify-between items-end mb-12">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-2 text-slate-900 dark:text-white">Selected Work</h2>
-            <p className="text-slate-500 dark:text-slate-400">Handpicked projects demonstrating API scalability and client design.</p>
-          </div>
-          <Link to="/projects" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-semibold text-sm">View all &rarr;</Link>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects?.slice(0, 3).map((project) => (
-            <div key={project.id} className="bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-xl overflow-hidden flex flex-col group hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
-              <div className="h-48 overflow-hidden relative">
-                <img src={project.coverImageUrl} alt={project.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                {project.featured && (
-                  <span className="absolute top-4 left-4 bg-indigo-600 text-white text-xs px-2.5 py-1 rounded-full font-semibold">
-                    Featured
-                  </span>
-                )}
-              </div>
-              <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-xl font-bold mb-3 line-clamp-2 text-slate-900 dark:text-white">{project.title}</h3>
-                <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-3">{project.summary}</p>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {project.techStack.map((tag) => (
-                    <span key={tag} className="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs px-2.5 py-1 rounded-md">{tag}</span>
-                  ))}
-                </div>
-                <div className="flex-grow" />
-                <div className="flex items-center justify-between mt-auto">
-                  <Link to={`/projects/${project.slug}`} className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 text-sm font-semibold flex items-center gap-1">
-                    Read Details &rarr;
-                  </Link>
-                  <div className="flex gap-3 text-slate-500 dark:text-slate-400">
-                    {project.repoUrl && <a href={project.repoUrl} target="_blank" rel="noreferrer" aria-label={`${project.title} repository`} className="hover:text-indigo-500 dark:hover:text-indigo-400"><Github size={18} /></a>}
-                    {project.liveUrl && <a href={project.liveUrl} target="_blank" rel="noreferrer" aria-label={`${project.title} live demo`} className="hover:text-indigo-500 dark:hover:text-indigo-400"><ExternalLink size={18} /></a>}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </motion.section>
+      <ProjectShowcase projects={projects} />
 
-      {/* Skills preview */}
-      <motion.section {...fadeInUp} id="skills" className="max-w-6xl mx-auto px-6 py-20 border-t border-slate-200 dark:border-slate-900">
-        <div className="flex justify-between items-end mb-12">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-2 text-slate-900 dark:text-white">Core Technology</h2>
-            <p className="text-slate-500 dark:text-slate-400 max-w-md">Expertise and frameworks used in production pipelines.</p>
-          </div>
-          <Link to="/about" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-semibold text-sm">Full skill set &rarr;</Link>
-        </div>
-        <div className="grid md:grid-cols-3 gap-8">
-          {Object.entries(skillsByCategory).map(([category, list]) => (
-            <div key={category} className="bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 p-8 rounded-xl">
-              <h3 className="text-xl font-bold mb-6 flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
-                <Award size={20} /> {category}
-              </h3>
-              <div className="space-y-6">
-                {list.map((skill) => (
-                  <div key={skill.id} id={`skill-${skill.id}`} className="scroll-mt-28">
-                    <div className="flex justify-between items-center gap-2 text-sm mb-2 font-medium">
-                      <span className="text-slate-800 dark:text-slate-200 flex items-center gap-1.5 min-w-0">
-                        <span className="truncate">{skill.name}</span>
-                        <SkillCertificationBadge skillName={skill.name} certifications={skill.certifications ?? []} />
-                      </span>
-                      {!skill.hideLevel && <span className="text-slate-500 dark:text-slate-400 shrink-0">{skill.level}/5</span>}
-                    </div>
-                    {/* Self-rating suppressed where a credential speaks for itself. */}
-                    {!skill.hideLevel && (
-                      <div className="h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500" style={{ width: `${(skill.level / 5) * 100}%` }} />
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </motion.section>
+      <CoreTechnology skills={skills} />
 
       {/* Blogs Brief */}
       {blogs && blogs.length > 0 && (
-        <motion.section {...fadeInUp} id="blog" className="max-w-6xl mx-auto px-6 py-20 border-t border-slate-200 dark:border-slate-900">
-          <div className="flex justify-between items-end mb-12">
+        <motion.section {...fadeInUp} id="blog" className="container-wide py-24 border-t border-slate-200 dark:border-slate-900">
+          <div className="flex flex-wrap justify-between items-end gap-4 mb-12">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-2 text-slate-900 dark:text-white">Latest Insights</h2>
+              <Kicker index="03">Writing</Kicker>
+              <h2 className="text-3xl md:text-4xl font-bold mt-3 mb-2 text-slate-900 dark:text-white">Latest insights</h2>
               <p className="text-slate-500 dark:text-slate-400">Guides, logs, and workflow reviews.</p>
             </div>
-            <Link to="/blog" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-semibold text-sm">View all &rarr;</Link>
+            <Link to="/blog" className="group inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+              All posts <span className="transition-transform group-hover:translate-x-0.5">&rarr;</span>
+            </Link>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogs.slice(0, 3).map((blog) => (
@@ -299,39 +191,14 @@ export default function Home() {
         </motion.section>
       )}
 
-      {/* Testimonials */}
-      {testimonials && testimonials.length > 0 && (
-        <motion.section {...fadeInUp} id="testimonials" className="max-w-6xl mx-auto px-6 py-20 border-t border-slate-200 dark:border-slate-900">
-          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-slate-900 dark:text-white">Testimonials</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {testimonials.map((t) => (
-              <div key={t.id} className="bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 p-8 rounded-xl flex flex-col">
-                <MessageSquare size={24} className="text-indigo-500 mb-6" />
-                <p className="text-slate-600 dark:text-slate-300 italic mb-8 flex-grow">&quot;{t.quote}&quot;</p>
-                <div className="flex items-center gap-4">
-                  {t.avatarUrl ? (
-                    <img src={t.avatarUrl} alt="" loading="lazy" className="w-12 h-12 rounded-full object-cover" />
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center font-bold text-indigo-600 dark:text-indigo-500 text-lg">
-                      {t.name[0]}
-                    </div>
-                  )}
-                  <div>
-                    <h4 className="font-bold text-slate-900 dark:text-white text-sm">{t.name}</h4>
-                    <p className="text-slate-500 text-xs">{t.role}{t.company ? ` at ${t.company}` : ''}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.section>
-      )}
+      <TestimonialsSection testimonials={testimonials} />
 
       {/* Contact Form Section */}
-      <motion.section {...fadeInUp} id="contact" className="max-w-6xl mx-auto px-6 py-20 border-t border-slate-200 dark:border-slate-900">
+      <motion.section {...fadeInUp} id="contact" className="container-wide py-24 border-t border-slate-200 dark:border-slate-900">
         <div className="grid md:grid-cols-2 gap-12">
           <div>
-            <h2 className="text-3xl font-bold mb-4 text-slate-900 dark:text-white">Let&apos;s Connect</h2>
+            <Kicker index="05">Contact</Kicker>
+            <h2 className="text-3xl font-bold mt-3 mb-4 text-slate-900 dark:text-white">Let&apos;s connect</h2>
             <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
               If you have a role opportunity, project, or simply want to say hello, submit the form here or send a message directly.
             </p>
@@ -341,8 +208,8 @@ export default function Home() {
                   <Mail size={18} />
                 </div>
                 <div>
-                  <span className="text-slate-500 text-xs block">Email Address</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">admin@portfolio.com</span>
+                  <span className="text-slate-500 text-xs block">Email</span>
+                  <a href="mailto:kathanshah.work@yahoo.com" className="font-semibold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">kathanshah.work@yahoo.com</a>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -350,8 +217,8 @@ export default function Home() {
                   <MapPin size={18} />
                 </div>
                 <div>
-                  <span className="text-slate-500 text-xs block">Location</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">San Francisco, CA</span>
+                  <span className="text-slate-500 text-xs block">Based in</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">Surat, India</span>
                 </div>
               </div>
             </div>
@@ -388,8 +255,8 @@ export default function Home() {
                 </div>
               )}
 
-              <button type="submit" className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 rounded-lg font-semibold text-white transition-colors disabled:opacity-60" disabled={contactMutation.isPending}>
-                {contactMutation.isPending ? 'Sending...' : 'Send Message'}
+              <button type="submit" className="btn-primary w-full py-3 disabled:opacity-60" disabled={contactMutation.isPending}>
+                {contactMutation.isPending ? 'Sending…' : 'Send message'}
               </button>
             </form>
           </div>

@@ -48,7 +48,7 @@ export default function Contact() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 pt-32 pb-24 text-slate-700 dark:text-slate-100 min-h-screen">
+    <div className="container-wide pt-32 pb-24 text-slate-700 dark:text-slate-100 min-h-screen">
       <Seo title="Contact" description="Get in touch about freelance opportunities, projects, or collaborations." path="/contact" />
 
       <div className="grid md:grid-cols-2 gap-12">
@@ -63,8 +63,8 @@ export default function Contact() {
                 <Mail size={18} />
               </div>
               <div>
-                <span className="text-slate-500 text-xs block">Email Address</span>
-                <span className="font-semibold text-slate-900 dark:text-white">admin@portfolio.com</span>
+                <span className="text-slate-500 text-xs block">Email</span>
+                <a href="mailto:kathanshah.work@yahoo.com" className="font-semibold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">kathanshah.work@yahoo.com</a>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -72,8 +72,8 @@ export default function Contact() {
                 <MapPin size={18} />
               </div>
               <div>
-                <span className="text-slate-500 text-xs block">Location</span>
-                <span className="font-semibold text-slate-900 dark:text-white">San Francisco, CA</span>
+                <span className="text-slate-500 text-xs block">Based in</span>
+                <span className="font-semibold text-slate-900 dark:text-white">Surat, India</span>
               </div>
             </div>
           </div>

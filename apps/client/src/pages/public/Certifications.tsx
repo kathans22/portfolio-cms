@@ -102,7 +102,7 @@ export default function Certifications() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 pt-32 pb-24 text-slate-700 dark:text-slate-100 min-h-screen">
+    <div className="container-wide pt-32 pb-24 text-slate-700 dark:text-slate-100 min-h-screen">
       <Seo title="Certifications" description="Third-party credentials and the skills they validate." path="/certifications" />
 
       <h1 className="text-3xl md:text-5xl font-extrabold mb-4 text-slate-900 dark:text-white">Certifications</h1>
@@ -193,11 +193,11 @@ export default function Certifications() {
                           const skill = skillById.get(skillId);
                           if (!skill) return null;
                           return (
-                            // Links back to the skill it validates — the badge on that
-                            // skill links here, closing the loop in both directions.
+                            // Links to the skill it validates on the home page's skill
+                            // grid — the badge on that skill links here, closing the loop.
                             <Link
                               key={skillId}
-                              to={`/about#skill-${skillId}`}
+                              to={`/#skill-${skillId}`}
                               className="bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs px-2.5 py-1 rounded-md transition-colors"
                             >
                               {skill.name}

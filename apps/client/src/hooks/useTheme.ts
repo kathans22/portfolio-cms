@@ -5,9 +5,9 @@ type Theme = 'light' | 'dark';
 function getInitialTheme(): Theme {
   const stored = localStorage.getItem('theme');
   if (stored === 'light' || stored === 'dark') return stored;
-  // matchMedia isn't implemented in every environment (e.g. jsdom in tests) — fall
-  // back to dark, matching the site's original default look, rather than throwing.
-  if (typeof window.matchMedia !== 'function') return 'dark';
+  // The site now leads with light (warm paper). Honour an explicit OS dark preference,
+  // but fall back to light where matchMedia is unavailable (e.g. jsdom in tests).
+  if (typeof window.matchMedia !== 'function') return 'light';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 

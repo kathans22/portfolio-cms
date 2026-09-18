@@ -44,6 +44,15 @@ export default tseslint.config(
       react: { version: 'detect' },
     },
   },
+  // react-three-fiber renders three.js's own scene graph as JSX; its intrinsics
+  // (mesh, meshStandardMaterial, ambientLight, ...) aren't DOM/React props, so
+  // react/no-unknown-property doesn't recognize them.
+  {
+    files: ['apps/client/src/components/public/SkillStackCanvas.tsx'],
+    rules: {
+      'react/no-unknown-property': 'off',
+    },
+  },
   // Node-context build scripts that live outside src/ (e.g. the sitemap prebuild script)
   {
     files: ['apps/client/scripts/**/*.mjs'],

@@ -4,97 +4,102 @@ import { motion } from 'framer-motion';
 import { useTheme } from '../hooks/useTheme';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { CmsNavDesktop, CmsNavMobile } from '../components/public/CmsNav';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Github, Linkedin } from 'lucide-react';
+
+/** Profile URLs as they appear on the résumé PDF. */
+const SOCIALS = [
+  { href: 'https://www.linkedin.com/in/kathanshah-dev/', label: 'LinkedIn', icon: Linkedin },
+  { href: 'https://github.com/kathans22', label: 'GitHub', icon: Github },
+];
+
+const LINKS = [
+  { to: '/projects', label: 'Projects' },
+  { to: '/blog', label: 'Blogs' },
+  { to: '/certifications', label: 'Certifications' },
+  { to: '/about', label: 'Résumé' },
+  { to: '/contact', label: 'Contact' },
+];
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
-  const isHome = location.pathname === '/';
+  const isActive = (to: string) =>
+    to === '/' ? location.pathname === '/' : location.pathname.startsWith(to);
 
   return (
     <div className={theme}>
-      <div className="bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-100 min-h-screen font-body transition-colors duration-200">
+      <div className="bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-200 min-h-screen font-body transition-colors duration-300">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:px-4 focus:py-2 focus:bg-indigo-600 focus:text-white focus:rounded-lg"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:px-4 focus:py-2 focus:bg-slate-900 focus:text-white focus:rounded-lg"
         >
           Skip to main content
         </a>
 
-        <header className="fixed top-0 left-0 right-0 h-20 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-900/80 flex items-center justify-between px-6 z-50">
-          <Link to="/" className="text-2xl font-bold tracking-tight text-gradient font-heading">
-            Kathan
-          </Link>
+        <header className="fixed top-0 left-0 right-0 z-50 h-20 border-b border-slate-200/70 bg-slate-50/80 backdrop-blur-xl dark:border-slate-800/60 dark:bg-slate-950/75">
+          <div className="container-wide flex h-full items-center justify-between">
+            <Link to="/" className="group flex items-center gap-2 font-heading text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+              <span className="grid h-7 w-7 place-items-center rounded-md bg-slate-900 font-mono text-sm text-white transition-transform group-hover:-rotate-6 dark:bg-white dark:text-slate-900">
+                K
+              </span>
+              Kathan
+            </Link>
 
-          {/* Desktop Nav */}
-          <nav aria-label="Primary" className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-500 dark:text-slate-400">
-            {isHome ? (
-              <>
-                <a href="#projects" className="hover:text-slate-900 dark:hover:text-white transition-colors">Projects</a>
-                <a href="#skills" className="hover:text-slate-900 dark:hover:text-white transition-colors">Skills</a>
-                <a href="#timeline" className="hover:text-slate-900 dark:hover:text-white transition-colors">Timeline</a>
-                <a href="#blog" className="hover:text-slate-900 dark:hover:text-white transition-colors">Blog</a>
-                <a href="#contact" className="hover:text-slate-900 dark:hover:text-white transition-colors">Contact</a>
-              </>
-            ) : (
-              <>
-                <Link to="/" className="hover:text-slate-900 dark:hover:text-white transition-colors">Home</Link>
-                <Link to="/projects" className="hover:text-slate-900 dark:hover:text-white transition-colors">Projects</Link>
-                <Link to="/blog" className="hover:text-slate-900 dark:hover:text-white transition-colors">Blog</Link>
-                <Link to="/contact" className="hover:text-slate-900 dark:hover:text-white transition-colors">Contact</Link>
-              </>
-            )}
-            <Link to="/certifications" className="hover:text-slate-900 dark:hover:text-white transition-colors">Certifications</Link>
-            <Link to="/about" className="hover:text-slate-900 dark:hover:text-white transition-colors">About</Link>
-            {/* Admin-created pages, appended to the hardcoded links. Renders nothing
-                until pages exist, so the header is unchanged on a fresh install. */}
-            <CmsNavDesktop />
-            <ThemeToggle />
-          </nav>
+            {/* Desktop nav */}
+            <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
+              {LINKS.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  aria-current={isActive(link.to) ? 'page' : undefined}
+                  className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                    isActive(link.to)
+                      ? 'text-slate-900 dark:text-white'
+                      : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <CmsNavDesktop />
+              <span className="mx-2 h-5 w-px bg-slate-200 dark:bg-slate-800" />
+              <ThemeToggle className="ml-1" />
+            </nav>
 
-          {/* Mobile Nav Toggle */}
-          <div className="md:hidden flex items-center gap-3">
-            <ThemeToggle />
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-expanded={mobileOpen}
-              aria-controls="mobile-nav"
-              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-              className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            >
-              {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            {/* Mobile toggle */}
+            <div className="flex items-center gap-2 md:hidden">
+              <ThemeToggle />
+              <button
+                onClick={() => setMobileOpen(!mobileOpen)}
+                aria-expanded={mobileOpen}
+                aria-controls="mobile-nav"
+                aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                className="rounded-md p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+              >
+                {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+            </div>
           </div>
         </header>
 
-        {/* Mobile menu */}
         {mobileOpen && (
           <nav
             id="mobile-nav"
             aria-label="Mobile"
-            className="fixed top-20 left-0 right-0 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-900 z-40 p-6 flex flex-col gap-4 font-semibold text-slate-600 dark:text-slate-300 md:hidden"
+            className="fixed inset-x-0 top-20 z-40 flex flex-col gap-1 border-b border-slate-200 bg-slate-50 p-6 text-base font-medium text-slate-600 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 md:hidden"
           >
-            {isHome ? (
-              <>
-                <a href="#projects" onClick={() => setMobileOpen(false)}>Projects</a>
-                <a href="#skills" onClick={() => setMobileOpen(false)}>Skills</a>
-                <a href="#timeline" onClick={() => setMobileOpen(false)}>Timeline</a>
-                <a href="#blog" onClick={() => setMobileOpen(false)}>Blog</a>
-                <a href="#contact" onClick={() => setMobileOpen(false)}>Contact</a>
-              </>
-            ) : (
-              <>
-                <Link to="/" onClick={() => setMobileOpen(false)}>Home</Link>
-                <Link to="/projects" onClick={() => setMobileOpen(false)}>Projects</Link>
-                <Link to="/blog" onClick={() => setMobileOpen(false)}>Blog</Link>
-                <Link to="/contact" onClick={() => setMobileOpen(false)}>Contact</Link>
-              </>
-            )}
-            <Link to="/certifications" onClick={() => setMobileOpen(false)}>Certifications</Link>
-            <Link to="/about" onClick={() => setMobileOpen(false)}>About</Link>
-            {/* Accordion, not a hover dropdown — hover has no meaning on touch. */}
+            {LINKS.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={() => setMobileOpen(false)}
+                className="rounded-md px-2 py-2.5 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-900 dark:hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
             <CmsNavMobile onNavigate={() => setMobileOpen(false)} />
           </nav>
         )}
@@ -102,15 +107,40 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         <motion.main
           id="main-content"
           className="min-h-screen"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, ease: 'easeOut' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
         >
           {children}
         </motion.main>
 
-        <footer className="border-t border-slate-200 dark:border-slate-900 py-10 text-center text-sm text-slate-500 bg-white dark:bg-slate-950">
-          &copy; {new Date().getFullYear()} Kathan. All rights reserved. Built using React 18, Express, and MongoDB.
+        <footer className="border-t border-slate-200 dark:border-slate-900">
+          {/* col-reverse on mobile so the profile links — the only actionable thing
+              down here — sit above the copyright line rather than under it. */}
+          <div className="container-wide flex flex-col-reverse items-center justify-between gap-5 py-10 text-sm text-slate-500 sm:flex-row">
+            <span className="font-mono text-xs">
+              © {new Date().getFullYear()} Kathan Shah
+            </span>
+
+            {/* aria-label carries the name because each anchor's only child is an icon
+                — without it a screen reader just announces "link". */}
+            <ul className="flex items-center gap-2">
+              {SOCIALS.map(({ href, label, icon: Icon }) => (
+                <li key={label}>
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Kathan Shah on ${label}`}
+                    title={label}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:border-slate-300 hover:bg-slate-100/70 hover:text-indigo-600 dark:border-slate-800 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:bg-slate-800/50 dark:hover:text-indigo-400"
+                  >
+                    <Icon size={16} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </footer>
       </div>
     </div>

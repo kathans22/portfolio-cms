@@ -5,7 +5,7 @@ import { apiFetch } from '../lib/api';
 import {
   LayoutDashboard, FolderKanban, Award, Briefcase, BadgeCheck, Layers,
   Bookmark, ChevronDown,
-  FileText, MessageSquare, Inbox, Image as ImageIcon, BarChart3, Settings as SettingsIcon,
+  FileText, FileDown, MessageSquare, Inbox, Image as ImageIcon, BarChart3, Settings as SettingsIcon,
   LogOut, Shield
 } from 'lucide-react';
 
@@ -31,6 +31,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     { path: '/admin/experience', label: 'Experience', icon: Briefcase },
     { path: '/admin/blogs', label: 'Blog Posts', icon: FileText },
     { path: '/admin/testimonials', label: 'Testimonials', icon: MessageSquare },
+    { path: '/admin/resume', label: 'Resume', icon: FileDown },
     { path: '/admin/messages', label: 'Submissions', icon: Inbox },
     { path: '/admin/media', label: 'Media Library', icon: ImageIcon },
     { path: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
@@ -51,13 +52,18 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-100 font-body">
       {/* Sidebar navigation */}
-      <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col fixed top-0 bottom-0 left-0 z-20">
-        <div className="p-6 border-b border-slate-800 flex items-center gap-2">
-          <Shield className="text-indigo-500 animate-pulse" size={24} />
-          <span className="font-extrabold tracking-wider font-heading text-gradient">AURA CMS</span>
+      <aside className="fixed left-0 top-0 bottom-0 z-20 flex w-64 flex-col border-r border-slate-800 bg-slate-900">
+        <div className="flex items-center gap-2.5 border-b border-slate-800 px-6 py-5">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-indigo-500/15 text-indigo-400">
+            <Shield size={17} />
+          </span>
+          <div className="leading-tight">
+            <span className="block font-heading text-sm font-bold tracking-wide text-white">AURA</span>
+            <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500">content studio</span>
+          </div>
         </div>
 
-        <nav aria-label="Admin" className="p-4 flex flex-col gap-1 flex-grow overflow-y-auto">
+        <nav aria-label="Admin" className="flex flex-grow flex-col gap-0.5 overflow-y-auto p-3">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -68,7 +74,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 aria-current={isActive ? 'page' : undefined}
                 className={`nav-btn ${isActive ? 'active' : ''}`}
               >
-                <Icon size={18} /> {item.label}
+                <Icon size={17} strokeWidth={2} /> {item.label}
               </Link>
             );
           })}
@@ -76,20 +82,24 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <ResourcesNav items={resourceItems} open={inResources} currentPath={location.pathname} />
         </nav>
 
-        <div className="p-4 border-t border-slate-800 flex items-center justify-between">
-          <div className="truncate">
-            <span className="block text-sm font-semibold truncate text-white">{user?.name}</span>
-            <span className="text-xs text-slate-500 truncate block">{user?.email}</span>
+        <div className="flex items-center justify-between gap-2 border-t border-slate-800 p-4">
+          <div className="min-w-0">
+            <span className="block truncate text-sm font-semibold text-white">{user?.name}</span>
+            <span className="block truncate font-mono text-[11px] text-slate-500">{user?.email}</span>
           </div>
-          <button onClick={handleLogout} aria-label="Log out" className="text-red-500 hover:text-red-400 p-2 transition-colors">
-            <LogOut size={18} />
+          <button
+            onClick={handleLogout}
+            aria-label="Log out"
+            className="shrink-0 rounded-md p-2 text-slate-500 transition-colors hover:bg-red-500/10 hover:text-red-400"
+          >
+            <LogOut size={17} />
           </button>
         </div>
       </aside>
 
       {/* Content panel */}
-      <main className="ml-64 flex-grow p-10">
-        {children}
+      <main className="ml-64 flex-grow p-6 md:p-10 lg:px-14 lg:py-12">
+        <div className="mx-auto max-w-[100rem]">{children}</div>
       </main>
     </div>
   );
@@ -123,15 +133,15 @@ function ResourcesNav({ items, open, currentPath }: {
       </button>
 
       {expanded && (
-        <div id="admin-nav-resources" className="ml-4 mt-1 flex flex-col gap-1 border-l border-slate-800 pl-3">
+        <div id="admin-nav-resources" className="ml-5 mt-0.5 flex flex-col gap-0.5 border-l border-slate-800 pl-3">
           {items.map((item) => (
             <Link
               key={item.path}
               to={item.path}
               aria-current={currentPath === item.path ? 'page' : undefined}
-              className={`text-sm py-1.5 px-2 rounded transition-colors ${
+              className={`rounded-md px-2 py-1.5 text-sm transition-colors ${
                 currentPath === item.path
-                  ? 'text-indigo-400 font-semibold'
+                  ? 'font-semibold text-indigo-300'
                   : 'text-slate-400 hover:text-white'
               }`}
             >

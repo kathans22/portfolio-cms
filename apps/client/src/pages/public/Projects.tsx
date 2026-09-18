@@ -63,7 +63,7 @@ export default function Projects() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-6 pt-32 pb-24 text-slate-700 dark:text-slate-100 min-h-screen">
+    <div className="container-wide pt-32 pb-24 text-slate-700 dark:text-slate-100 min-h-screen">
       <Seo title="Projects" description="Case studies across software development, AI engineering, and data engineering." path="/projects" />
 
       <h1 className="text-3xl md:text-5xl font-extrabold mb-4 text-slate-900 dark:text-white">Case Studies</h1>

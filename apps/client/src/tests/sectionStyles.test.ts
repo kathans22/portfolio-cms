@@ -18,7 +18,7 @@ describe('sectionStyles', () => {
   it('applies defaults when given nothing', () => {
     const styles = sectionStyles();
     expect(styles.section).toContain('py-20');
-    expect(styles.container).toContain('max-w-5xl');
+    expect(styles.container).toContain('max-w-7xl');
     expect(styles.grid).toContain('lg:grid-cols-3');
   });
 
@@ -35,7 +35,7 @@ describe('sectionStyles', () => {
     expect(styles.section).toContain('bg-indigo-50');
     expect(styles.section).toContain('py-6');
     expect(styles.section).toContain('border-t');
-    expect(styles.container).toContain('max-w-3xl');
+    expect(styles.container).toContain('max-w-4xl');
     expect(styles.container).toContain('text-center');
     expect(styles.grid).toContain('sm:grid-cols-2');
   });

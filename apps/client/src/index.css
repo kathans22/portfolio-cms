@@ -2,96 +2,422 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Theme applies site-wide via the .dark class on <html>, but the admin panel (AdminLayout)
-   always renders its own explicit dark background regardless — it isn't part of the public
-   dark/light toggle, so it's visually unaffected by any of this. */
+/*
+ * Warm minimalist "paper & ink". The public site toggles light/dark via a `.dark`
+ * class on the PublicLayout wrapper; the admin panel (AdminLayout) renders its own
+ * warm-dark surface and is unaffected by the toggle.
+ */
 @layer base {
+  :root {
+    color-scheme: light;
+  }
+  .dark {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Fixed 80px header — keep anchor targets clear of it. */
+    scroll-padding-top: 6rem;
+  }
+
   body {
-    @apply bg-white text-slate-700 dark:text-slate-200 font-body antialiased transition-colors duration-200;
+    @apply bg-slate-50 text-slate-700 dark:text-slate-200 font-body antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
   .dark body {
-    background-color: #0a0c10;
+    background-color: #1c1813;
   }
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading text-slate-900 dark:text-white;
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background-color: rgba(154, 85, 55, 0.18);
+    color: #2a251e;
+  }
+  .dark ::selection {
+    background-color: rgba(192, 126, 92, 0.30);
+    color: #ffffff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-/* Custom Scrollbar */
+/* Custom scrollbar — warm, quiet. */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-slate-100 dark:bg-[#0a0c10];
+  @apply bg-slate-100 dark:bg-[#1c1813];
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-[#161b26];
+  @apply bg-slate-300 dark:bg-slate-800;
   border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #6366f1;
+  @apply bg-slate-400 dark:bg-slate-700;
+  background-clip: content-box;
 }
 
-/* Gradient text */
+/* Warm accent gradient — used for a few display words, deliberately subtle. */
 .text-gradient {
-  background: linear-gradient(135deg, #6366f1, #10b981);
+  background: linear-gradient(118deg, #9a5537 0%, #b9814e 60%, #7b8a5f 120%);
   -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Legacy alias — a few components still reference this. */
+.float-animation {
+  animation: float 7s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/*
+ * Hero "agent" answer line. A highlight band sweeps across the glyphs while the
+ * typewriter is mid-answer, then parks off the text once it settles — the token-
+ * streaming shimmer you get in a modern AI coding CLI.
+ *
+ * `color` carries the solid fallback: if a browser ignores -webkit-text-fill-color
+ * the text still renders in the base ink instead of disappearing.
+ */
+.agent-stream {
+  /* The panel is a dark terminal surface in both themes, so these don't flip. */
+  --stream-base: #f3f1ea;
+  --stream-hi: #e9c9a6;
+  color: var(--stream-base);
+  background-image: linear-gradient(
+    100deg,
+    var(--stream-base) 0%,
+    var(--stream-base) 42%,
+    var(--stream-hi) 50%,
+    var(--stream-base) 58%,
+    var(--stream-base) 100%
+  );
+  background-size: 240% 100%;
+  background-position: 100% 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+.agent-stream.is-live {
+  animation: agent-shimmer 2.4s linear infinite;
+}
+/*
+ * Stay inside 0%–100%. A background-position outside that range moves a no-repeat
+ * image clear of the box, and with background-clip:text that paints the glyphs with
+ * nothing at all — the text silently disappears mid-sweep.
+ *
+ * At 100% the box samples the gradient's 58–100% span and at 0% its 0–42% span, both
+ * of which are flat `--stream-base`; only the trip between them drags the highlight
+ * band across the glyphs.
+ */
+@keyframes agent-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: 0% 0; }
 }
 
-.float-animation {
-  animation: float 6s ease-in-out infinite;
+/* Faint dotted grid, fading out from a corner. Decorative only. */
+.dot-grid {
+  background-image: radial-gradient(currentColor 1px, transparent 1px);
+  background-size: 22px 22px;
 }
 
-/* These live in @layer components so Tailwind emits them *before* the utilities layer.
-   Defined outside a layer they land after it, and their `w-full` silently beats a
-   `w-auto` on the same element — which is why filter selects rendered full-width. */
+/* Very light film grain so flat warm fills don't read as clinical. */
+.grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.dark .grain::after {
+  opacity: 0.05;
+}
+
+/* These live in @layer components so Tailwind emits them before the utilities layer.
+   Outside a layer they land after it and their `w-full` silently beats a `w-auto`
+   on the same element — which is why filter selects once rendered full-width. */
 @layer components {
 
-/* Input Fields class — admin panel only, deliberately dark-only (see note above) */
-.input-field {
-  @apply w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-white outline-none focus:border-indigo-500 transition-colors placeholder:text-slate-600 text-sm;
+  /* Admin panel form fields — warm-dark surface. */
+  .input-field {
+    @apply w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-white outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors placeholder:text-slate-500 text-sm;
+  }
+
+  /* Public-facing form fields — theme-aware. */
+  .form-input {
+    @apply w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-900 dark:text-white outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm;
+  }
+
+  /* Primary action — ink on paper, inverted in dark. The single loudest element on
+     a page; the accent colour is saved for detail. */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-semibold shadow-soft hover:shadow-lift hover:-translate-y-0.5 transition-all duration-200;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-transparent border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold hover:border-slate-400 dark:hover:border-slate-500 hover:bg-slate-100/60 dark:hover:bg-slate-800/50 transition-colors;
+  }
+
+  /* Mono eyebrow / kicker label. */
+  .kicker {
+    @apply font-mono text-[11px] uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-400;
+  }
+
+  /* The one page container. A touch wider than a classic 6xl, never sprawling. */
+  .container-wide {
+    @apply mx-auto w-full max-w-[80rem] px-5 sm:px-8;
+  }
 }
 
-/* Public-facing form fields — theme-aware */
-.form-input {
-  @apply w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-900 dark:text-white outline-none focus:border-indigo-500 transition-colors placeholder:text-slate-400 dark:placeholder:text-slate-600 text-sm;
-}
-
-}
-
-/* Sidebar Custom class — admin panel only, deliberately dark-only */
+/* Admin sidebar links — warm-dark. */
 .nav-btn {
-  @apply flex items-center gap-3 px-4 py-2.5 w-full rounded-md text-slate-400 font-medium text-sm hover:bg-slate-800 hover:text-white transition-all text-left;
+  @apply flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-slate-400 font-medium text-sm hover:bg-slate-800/70 hover:text-white transition-colors text-left;
 }
 .nav-btn.active {
-  @apply bg-indigo-950/40 text-indigo-400 font-semibold;
+  @apply bg-indigo-500/10 text-indigo-300 font-semibold;
 }
 
-/* Markdown parsing typography — public pages, theme-aware */
+/* Markdown typography — public pages, theme-aware. */
 .blog-content h2, .blog-content h3, .project-content h2, .project-content h3,
 .prose-content h2, .prose-content h3 {
-  @apply text-xl font-bold mt-6 mb-3 text-slate-900 dark:text-white;
+  @apply font-heading text-xl font-bold mt-8 mb-3 text-slate-900 dark:text-white;
 }
 .blog-content p, .blog-content pre, .project-content p, .prose-content p {
   @apply mb-4 text-slate-600 dark:text-slate-300 leading-relaxed text-sm;
 }
 .blog-content a, .project-content a, .prose-content a {
-  @apply text-indigo-600 dark:text-indigo-400 underline underline-offset-2;
+  @apply text-indigo-600 dark:text-indigo-400 underline underline-offset-2 decoration-indigo-300 dark:decoration-indigo-700;
 }
 .blog-content code, .project-content code, .prose-content code {
-  @apply bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono text-sm;
+  @apply bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono text-[0.85em];
 }
 .blog-content pre, .project-content pre, .prose-content pre {
-  @apply bg-slate-50 dark:bg-slate-900 p-4 rounded-lg overflow-x-auto my-4;
+  @apply bg-slate-900 dark:bg-slate-900 text-slate-100 p-4 rounded-xl overflow-x-auto my-5 border border-slate-800;
 }
 .blog-content pre code, .project-content pre code, .prose-content pre code {
-  @apply bg-transparent p-0 text-xs;
+  @apply bg-transparent p-0 text-xs text-slate-100;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Route door transition (components/transition/DoorTransition.tsx)
+
+   Two panels sweep shut, the page swaps behind them, then they swing open on
+   their outer hinges in 3D. Everything here is transform/opacity only, so it
+   composites on the GPU and needs no WebGL.
+
+   Phase → animation is driven by class, not by JS-set transforms: an entering
+   element cannot transition from a start value it was never rendered at, so the
+   closing leg has to be a keyframe rather than a transition.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.door-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  overflow: hidden;
+}
+
+/* The shared 3D context. Without perspective here the panels would rotate flat. */
+.door-stage {
+  position: absolute;
+  inset: 0;
+  perspective: 1600px;
+  perspective-origin: 50% 45%;
+}
+
+.door-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.5%; /* half a percent of overlap so no hairline seam shows through */
+  background: linear-gradient(160deg, #2a251e 0%, #1c1813 55%, #14110d 100%);
+  backface-visibility: hidden;
+  animation-duration: 260ms;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  animation-fill-mode: forwards;
+}
+
+.door-panel--left {
+  left: 0;
+  transform-origin: left center;
+  border-right: 1px solid rgba(192, 126, 92, 0.25);
+  animation-name: door-close-left;
+}
+.door-panel--right {
+  right: 0;
+  transform-origin: right center;
+  animation-name: door-close-right;
+}
+
+/* Swing out on the outer hinge. Slightly past 90° so the panel clears the frame. */
+.door-panel.is-opening {
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.5, 0, 0.2, 1);
+}
+.door-panel--left.is-opening {
+  animation-name: door-open-left;
+}
+.door-panel--right.is-opening {
+  animation-name: door-open-right;
+}
+
+@keyframes door-close-left {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes door-close-right {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes door-open-left {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(-112deg); }
+}
+@keyframes door-open-right {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(112deg); }
+}
+
+/* Warm light bleeding through the join. */
+.door-seam {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(222, 187, 164, 0.55),
+    transparent
+  );
+  opacity: 0;
+  animation: door-seam-in 260ms 200ms ease-out forwards;
+}
+.door-seam.is-opening {
+  animation: door-seam-out 180ms ease-in forwards;
+}
+@keyframes door-seam-in  { to { opacity: 1; } }
+@keyframes door-seam-out { from { opacity: 1; } to { opacity: 0; } }
+
+.door-handle {
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 46px;
+  border-radius: 2px;
+  background: rgba(222, 187, 164, 0.45);
+  transform: translateY(-50%);
+}
+.door-panel--left .door-handle { right: 16px; }
+.door-panel--right .door-handle { left: 16px; }
+
+.door-label {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  transform: translate(-50%, -50%);
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  font-size: 12px;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: #e7e3da;
+  white-space: nowrap;
+  opacity: 0;
+  animation: door-label-in 240ms 220ms ease-out forwards;
+}
+.door-label.is-opening {
+  animation: door-label-out 160ms ease-in forwards;
+}
+.door-label-rule {
+  display: block;
+  width: 34px;
+  height: 1px;
+  background: rgba(192, 126, 92, 0.7);
+}
+@keyframes door-label-in {
+  from { opacity: 0; transform: translate(-50%, -50%) translateY(6px); }
+  to   { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
+}
+@keyframes door-label-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* Track carries the horizontal run; the child does the centring, so the two
+   transforms never fight over the same property. */
+.door-runner-track {
+  position: absolute;
+  top: 56%;
+  left: 0;
+  width: 100%;
+  animation: door-run-across 480ms cubic-bezier(0.3, 0, 0.5, 1) forwards;
+}
+.door-runner-track.is-opening {
+  animation: door-run-through 300ms ease-in forwards;
+}
+.door-runner {
+  /* max-content is load-bearing: as a plain block this div would inherit the track's
+     full width, and translateX(-50%) would then shift it half the *viewport* rather
+     than half the figure — putting the runner ~565px off-screen left. */
+  width: max-content;
+  transform: translateX(-50%);
+  color: #debba4;
+}
+.door-runner-svg {
+  width: 58px;
+  height: 74px;
+  animation: door-runner-bob 220ms steps(2, end) infinite;
+}
+
+@keyframes door-run-across {
+  from { transform: translateX(4%); opacity: 0; }
+  18%  { opacity: 1; }
+  to   { transform: translateX(50%); opacity: 1; }
+}
+@keyframes door-run-through {
+  from { transform: translateX(50%) scale(1); opacity: 1; }
+  to   { transform: translateX(66%) scale(1.35); opacity: 0; }
+}
+@keyframes door-runner-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+/* Two-frame stride, alternated fast enough to read as a run cycle. */
+.door-pose-a { animation: door-pose-a 200ms steps(1, end) infinite; }
+.door-pose-b { animation: door-pose-b 200ms steps(1, end) infinite; }
+@keyframes door-pose-a { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+@keyframes door-pose-b { 0%, 49% { opacity: 0; } 50%, 100% { opacity: 1; } }
+
+.door-trail { animation: door-trail 200ms ease-out infinite; }
+@keyframes door-trail {
+  0%   { opacity: 0.2; transform: translateX(4px); }
+  60%  { opacity: 0.9; }
+  100% { opacity: 0.2; transform: translateX(0); }
 }
