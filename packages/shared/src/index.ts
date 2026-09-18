@@ -122,6 +122,46 @@ export const testimonialSchema = z.object({
 });
 export type TestimonialInput = z.infer<typeof testimonialSchema>;
 
+/**
+ * An image link for the home page photo — typically a Google Drive share link set to
+ * "Anyone with the link can view". https only: the page is served over https, and a
+ * plain-http image would be blocked as mixed content.
+ */
+export const profilePhotoLinkSchema = z.object({
+  url: z
+    .string()
+    .trim()
+    .url('Please paste a valid link')
+    .refine((u) => u.startsWith('https://'), 'The link must start with https://'),
+});
+export type ProfilePhotoLinkInput = z.infer<typeof profilePhotoLinkSchema>;
+
+/**
+ * What a *visitor* may send. Deliberately narrower than `testimonialSchema`:
+ *
+ * - no `order` or `status` — placement and publication are the admin's call, never
+ *   the submitter's;
+ * - no `avatarUrl` — an arbitrary attacker-controlled URL rendered in an <img> on
+ *   the public site is a tracking pixel at best;
+ * - `email` is collected so the owner can verify a claimed identity before
+ *   publishing, and is never returned by a public endpoint.
+ */
+
+export const testimonialSubmissionSchema = z.object({
+  name: z.string().min(2, 'Name is required').max(80),
+  role: z.string().min(2, 'Your role is required').max(80),
+  company: z.string().max(80).optional().or(z.literal('')),
+  email: z.string().email('Please enter a valid email address'),
+  quote: z
+    .string()
+    .min(30, 'Please write at least 30 characters')
+    .max(1200, 'Please keep it under 1200 characters'),
+  // Honeypot: a field real users never see or fill. Bots that auto-fill forms often
+  // populate it — if it's non-empty, the server silently drops the submission.
+  website: z.string().optional().or(z.literal('')),
+});
+export type TestimonialSubmissionInput = z.infer<typeof testimonialSubmissionSchema>;
+
 // 8. Certification Schema
 //
 // `skillIds` holds real Skill document ids, never free-text skill names — "Node.js",
@@ -422,3 +462,22 @@ export type ResourcePatchInput = z.infer<typeof resourcePatchSchema>;
 
 export const resourceStatusSchema = z.object({ status: referenceStatusSchema });
 export type ResourceStatusInput = z.infer<typeof resourceStatusSchema>;
+
+// 11. Resume Management
+//
+// PUBLIC-FACING by design. The admin uploads PDF resumes; every upload is kept as its
+// own document and exactly one is active at a time. This schema only covers the
+// editable text field — the file itself is a multipart upload whose type is verified
+// by its magic bytes server-side (a file extension and a Content-Type are both
+// client-controlled, so neither is trusted).
+export const resumeLabelSchema = z
+  .string()
+  .trim()
+  .max(120, 'Label must be 120 characters or fewer')
+  .optional()
+  .or(z.literal(''));
+
+export const resumeUpdateSchema = z.object({
+  label: resumeLabelSchema,
+});
+export type ResumeUpdateInput = z.infer<typeof resumeUpdateSchema>;

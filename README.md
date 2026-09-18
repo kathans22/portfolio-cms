@@ -37,7 +37,7 @@ A production-grade developer portfolio and admin CMS, built with React 18, Expre
 ```
 
 - **`apps/client`** — the public portfolio site and the `/admin` CMS panel, in one React app. Routes are code-split with `React.lazy` so the admin bundle (recharts, prism syntax highlighting, drag-and-drop editors) never ships to public visitors, and vice versa.
-- **`apps/server`** — a modular Express API. Each content type (`projects`, `blog`, `skills`, `experience`, `education`, `testimonials`, `messages`, `media`, `analytics`, `auth`) is its own module under `src/modules/<name>/` with its own Mongoose model, route file, and (where covered) test file.
+- **`apps/server`** — a modular Express API. Each content type (`projects`, `blog`, `skills`, `experience`, `education`, `testimonials`, `messages`, `media`, `analytics`, `resume`, `auth`) is its own module under `src/modules/<name>/` with its own Mongoose model, route file, and (where covered) test file.
 - **`packages/shared`** — Zod validation schemas (`projectSchema`, `blogSchema`, `contactSchema`, …). Both the client (`react-hook-form` + `@hookform/resolvers/zod`) and the server (`validateRequest` middleware) validate against the exact same schema, and both derive their TypeScript input types from it via `z.infer` — there is no manually-kept-in-sync duplicate type.
 - **`packages/types`** — plain TypeScript interfaces describing the shape of documents as the API actually returns them (after `id`/`_id` normalization). Used by the client to type `useQuery`/`useMutation` results without pulling in Mongoose.
 
@@ -113,6 +113,37 @@ page composed from it looks like it belongs to the same site, which is the entir
 
 ---
 
+## 📄 Résumé
+
+Admin uploads PDF versions of the CV at `/admin/resume`. Every upload is its own
+document — files are never overwritten — and exactly one row is `isActive` (enforced by
+a partial unique index, not just app logic). The public site links to whichever version
+is active:
+
+- `GET /api/v1/resume` — metadata for the active version, or 404. Only the active row is
+  ever exposed; storage keys and inactive versions never cross this boundary.
+- `GET /api/v1/resume/download` — 302 to the active file. A stable link that keeps
+  working after a rollback, so it's safe to share directly.
+
+The first upload goes live automatically. After that, switching what the site shows is
+one **Activate** click on any row (upload a new PDF, or re-activate an old one to roll
+back). The active version cannot be deleted — activate a different one first.
+
+Uploads are validated by **magic bytes** (`%PDF-`), not by the file extension or the
+declared `Content-Type`, both of which the client controls. Max 8 MB.
+
+> **Content practice, not code:** upload a public-safe PDF (email + city, no phone or
+> street address). A public file URL gets harvested by scrapers and a CDN copy can't be
+> recalled. Hand the full-detail version directly to recruiters who make contact.
+
+> **Cloudinary:** PDF delivery is blocked by default on new accounts. If resume links
+> return 401/403 from `res.cloudinary.com`, enable **Settings → Security → Allow
+> delivery of PDF and ZIP files**. With no Cloudinary credentials set, files are served
+> from the local `/uploads` directory instead (fine for a single Render instance; note
+> Render's free tier has an ephemeral filesystem, so prefer Cloudinary in production).
+
+---
+
 ## ⚡ Performance model
 
 **One request per page view.** A CMS page's sections are expanded server-side by the
@@ -128,6 +159,15 @@ Invalidation is registered on the Mongoose schemas
 (`invalidatesResolveCache(Schema, 'Project')`), not in individual admin routes, so a route
 added later inherits it rather than silently serving stale content. Responses carry a
 strong ETag and `Cache-Control: public, max-age=60, stale-while-revalidate=300`.
+
+The derived list endpoints — `/nav`, `/sitemap`, `/sitemap.xml` — use the same
+`Map` (via `getDerived` / `setDerived`) tagged with the models they read (`Page`, plus
+`Project` and `BlogPost` for the XML sitemap), so the schema hooks that already bust the
+page cache bust these too. A page deleted or published in the CMS drops out of the menu
+immediately for a fresh visitor, instead of riding a `Cache-Control` header for minutes.
+Their wire cache is correspondingly short (`max-age=30, stale-while-revalidate=120`) since
+it no longer has to paper over staleness; the client (`useNav`) mirrors this with a
+60-second `staleTime`.
 
 > **This cache is per-process, and that is a deliberate choice.** On a single free-tier
 > Render instance an in-process Map is sufficient and costs nothing to boot. Do not add

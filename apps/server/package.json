@@ -10,6 +10,7 @@
     "db:seed": "ts-node src/seed.ts",
     "db:indexes": "ts-node src/scripts/syncIndexes.ts",
     "db:backfill-pages": "ts-node src/scripts/backfillPages.ts",
+    "db:seed-timeline": "ts-node src/scripts/seedResumeTimeline.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },

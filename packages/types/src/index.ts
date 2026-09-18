@@ -173,6 +173,11 @@ export interface Testimonial {
   quote: string;
   avatarUrl?: string;
   order: number;
+  /** Visitor submissions land PENDING and are invisible until approved in admin. */
+  status?: 'PENDING' | 'APPROVED';
+  /** Admin-only. Public endpoints never project this field. */
+  email?: string;
+  submittedAt?: string | null;
 }
 
 export interface ContactMessage {
@@ -191,6 +196,30 @@ export interface PageView {
   path: string;
   referrer?: string;
   createdAt: string;
+  updatedAt: string;
+}
+
+// Resume management. Every PDF upload is its own document; exactly one is active at a
+// time and the public site links to whichever that is. Old versions stay in storage and
+// stay listed in admin, but are never reachable publicly.
+export interface Resume {
+  id: string;
+  label?: string;
+  fileUrl: string;
+  originalName: string;
+  provider: 'local' | 'cloudinary';
+  fileSize?: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// What GET /api/v1/resume returns — only ever the active version, and only the fields
+// the public site needs. Storage keys and inactive versions never cross this boundary.
+export interface PublicResume {
+  fileUrl: string;
+  label?: string;
+  originalName: string;
   updatedAt: string;
 }
 
