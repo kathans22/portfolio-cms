@@ -2,6 +2,21 @@
 // the deployed site would call every visitor's own localhost, which doesn't exist.
 export const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
+/** The API server's origin, e.g. `http://localhost:5000`. */
+export const API_ORIGIN = API_BASE.replace(/\/api\/v\d+\/?$/, '');
+
+/**
+ * Resolves a stored asset URL for use in the browser.
+ *
+ * When Cloudinary isn't configured, uploads fall back to local disk and the server
+ * records a *relative* URL like `/uploads/x.jpg`. The browser would resolve that
+ * against the site's own origin — the client, not the API that actually serves
+ * `/uploads` — and 404. Absolute URLs (Cloudinary) pass through untouched.
+ */
+export function assetUrl(url: string): string {
+  return url.startsWith('/uploads/') ? `${API_ORIGIN}${url}` : url;
+}
+
 function readCookie(name: string): string | null {
   const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
   return match ? decodeURIComponent(match[1]) : null;
