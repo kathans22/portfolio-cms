@@ -46,7 +46,7 @@ export default function DynamicPage({ page }: DynamicPageProps) {
       </Helmet>
 
       {ancestors.length > 0 && (
-        <div className="max-w-5xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
           <Breadcrumbs ancestors={ancestors} current={page.navLabel || page.title} />
         </div>
       )}

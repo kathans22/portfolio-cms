@@ -32,6 +32,23 @@ export interface ResolveCacheEntry<T = unknown> {
 
 const cache = new Map<string, ResolveCacheEntry>();
 
+/**
+ * Derived list endpoints — `/nav`, `/sitemap`, `/sitemap.xml` — rebuilt from Page
+ * (and, for the XML sitemap, Project and BlogPost). They are not path-keyed page
+ * resolutions, but they have the same problem: a delete or publish should reach them
+ * immediately rather than let them ride their `Cache-Control` header for minutes.
+ *
+ * Kept in a separate map so `getCachedResolve`'s path semantics and ETag handling
+ * stay untouched, but swept by the same `invalidateCollection` / `clearResolveCache`
+ * so a model already wired with `invalidatesResolveCache` busts these for free.
+ */
+interface DerivedEntry {
+  payload: unknown;
+  dependsOn: Set<string>;
+  expiresAt: number;
+}
+const derived = new Map<string, DerivedEntry>();
+
 const stats = { hits: 0, misses: 0, invalidations: 0 };
 
 export function getCachedResolve<T>(path: string): ResolveCacheEntry<T> | undefined {
@@ -60,6 +77,32 @@ export function setCachedResolve<T>(path: string, payload: T, etag: string, depe
   cache.set(path, { payload, etag, dependsOn, expiresAt: Date.now() + RESOLVE_CACHE_TTL_MS });
 }
 
+/** Read a derived list response (`/nav`, `/sitemap*`). Undefined on miss or expiry. */
+export function getDerived<T>(key: string): T | undefined {
+  const entry = derived.get(key);
+  if (!entry) {
+    stats.misses++;
+    return undefined;
+  }
+  if (entry.expiresAt <= Date.now()) {
+    derived.delete(key);
+    stats.misses++;
+    return undefined;
+  }
+  stats.hits++;
+  return entry.payload as T;
+}
+
+/** Cache a derived list response, tagged with the models it was built from. */
+export function setDerived(
+  key: string,
+  payload: unknown,
+  dependsOn: Set<string>,
+  ttlMs: number = RESOLVE_CACHE_TTL_MS
+): void {
+  derived.set(key, { payload, dependsOn, expiresAt: Date.now() + ttlMs });
+}
+
 /**
  * Drops every entry whose content came from this collection.
  *
@@ -72,6 +115,12 @@ export function invalidateCollection(modelName: string): void {
   for (const [path, entry] of cache) {
     if (entry.dependsOn.has(modelName)) {
       cache.delete(path);
+      dropped++;
+    }
+  }
+  for (const [key, entry] of derived) {
+    if (entry.dependsOn.has(modelName)) {
+      derived.delete(key);
       dropped++;
     }
   }
@@ -88,13 +137,14 @@ export function invalidateAllPages(): void {
 
 export function clearResolveCache(): void {
   cache.clear();
+  derived.clear();
   stats.hits = 0;
   stats.misses = 0;
   stats.invalidations = 0;
 }
 
 export function resolveCacheStats() {
-  return { ...stats, size: cache.size };
+  return { ...stats, size: cache.size, derivedSize: derived.size };
 }
 
 /**

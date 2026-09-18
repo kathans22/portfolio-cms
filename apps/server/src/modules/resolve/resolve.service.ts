@@ -6,7 +6,7 @@ import { BlogPost } from '../blog/blogPost.model';
 import { fetchSkillsWithCertifications } from '../skills/withCertifications';
 import { Experience } from '../experience/experience.model';
 import { Education } from '../education/education.model';
-import { Testimonial } from '../testimonials/testimonial.model';
+import { Testimonial, publicTestimonialFilter } from '../testimonials/testimonial.model';
 import { Certification, publicCertificationFilter } from '../certifications/certification.model';
 import { toPublicCertification } from '../certifications/publicView';
 import { Page, PageDoc, SectionAttrs } from '../pages/page.model';
@@ -147,7 +147,9 @@ async function resolveCollectionSection(section: SectionAttrs): Promise<unknown[
         .limit(limit);
 
     case 'TESTIMONIAL_LIST':
-      return Testimonial.find()
+      // Same moderation gate as GET /testimonials — a CMS section must never be the
+      // back door that publishes an unapproved visitor submission.
+      return Testimonial.find(publicTestimonialFilter)
         .select(LIST_PROJECTIONS.TESTIMONIAL_LIST)
         .sort(sortSpec(section, 'order'))
         .limit(limit);

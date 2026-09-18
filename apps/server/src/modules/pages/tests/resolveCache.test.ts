@@ -138,6 +138,64 @@ describe('Section 7 resolve cache', () => {
   });
 });
 
+describe('Section 7 derived list cache (/nav, /sitemap)', () => {
+  const getNav = () => request(app).get('/api/v1/nav');
+  const getSitemap = () => request(app).get('/api/v1/sitemap');
+
+  it('serves /nav from memory on the second hit', async () => {
+    await seedPage();
+
+    expect((await getNav()).headers['x-cache']).toBe('MISS');
+    expect((await getNav()).headers['x-cache']).toBe('HIT');
+  });
+
+  it('sends the short derived Cache-Control, not the page one', async () => {
+    await seedPage();
+    const res = await getNav();
+    expect(res.headers['cache-control']).toBe('public, max-age=30, stale-while-revalidate=120');
+  });
+
+  it('busts a warm /nav when a page it lists is deleted', async () => {
+    const token = await login();
+    const page = await seedPage();
+
+    expect((await getNav()).body).toHaveLength(1);
+    expect((await getNav()).headers['x-cache']).toBe('HIT'); // cache is now warm
+
+    await request(app).delete(`/api/v1/admin/pages/${page._id}`).set(auth(token));
+
+    const after = await getNav();
+    // Without derived-cache invalidation this stays the warm 1-entry tree for up to a
+    // minute, and the deleted page keeps showing in the visitor's menu.
+    expect(after.headers['x-cache']).toBe('MISS');
+    expect(after.body).toHaveLength(0);
+  });
+
+  it('busts a warm /sitemap when a page is published through', async () => {
+    const token = await login();
+    const page = await seedPage({ status: 'DRAFT' });
+
+    expect((await getSitemap()).body).toHaveLength(0); // warms the cache on a draft
+
+    await request(app)
+      .patch(`/api/v1/admin/pages/${page._id}`)
+      .set(auth(token))
+      .send({ title: 'Work', slug: 'work', status: 'PUBLISHED' });
+
+    expect((await getSitemap()).body).toHaveLength(1);
+  });
+
+  it('leaves a warm /nav alone when an unrelated collection is written', async () => {
+    await seedPage();
+    await getNav();
+
+    // Nav is built from Page only — a Project write is none of its business.
+    await seedProject();
+
+    expect((await getNav()).headers['x-cache']).toBe('HIT');
+  });
+});
+
 describe('Section 7 public projections', () => {
   it('projects only the fields a project card renders', async () => {
     await seedPage();

@@ -25,7 +25,10 @@ function useNav() {
   const query = useQuery<NavNode[]>({
     queryKey: ['nav'],
     queryFn: async () => (await apiFetch('/nav')).json(),
-    staleTime: 5 * 60_000,
+    // Short enough that a page deleted in the CMS drops out of a visitor's menu within
+    // a minute (the server busts its own cache on the write; this is the client half).
+    // The admin also invalidates ['nav'] directly after a page write for its own session.
+    staleTime: 60_000,
     // Nav is additive to the hardcoded links; if it fails the header still works.
     retry: 1,
   });
