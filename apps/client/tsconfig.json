@@ -5,7 +5,7 @@
     "lib": ["DOM", "DOM.Iterable", "ES2020"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "typeRoots": ["../../node_modules/@types"],
     "resolveJsonModule": true,
     "isolatedModules": true,
