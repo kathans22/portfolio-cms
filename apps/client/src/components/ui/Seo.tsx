@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 
-const SITE_NAME = 'Kathan — Portfolio';
+const SITE_NAME = 'Kathan Shah';
 const DEFAULT_DESCRIPTION = 'Full-stack engineer and solutions architect building production-grade web, AI, and data platforms.';
 const DEFAULT_OG_IMAGE = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&auto=format&fit=crop&q=80';
 const SITE_URL = typeof window !== 'undefined' ? window.location.origin : '';
@@ -19,7 +19,7 @@ interface SeoProps {
 const PERSON_JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'Person',
-  name: 'Kathan',
+  name: 'Kathan Shah',
   jobTitle: 'Full-Stack Developer & Solutions Architect',
   description: DEFAULT_DESCRIPTION,
   knowsAbout: ['Software Development', 'AI Engineering', 'Data Engineering'],
@@ -34,7 +34,8 @@ export function Seo({
   noIndex = false,
   personSchema = false,
 }: SeoProps) {
-  const fullTitle = title === SITE_NAME ? title : `${title} · ${SITE_NAME}`;
+  // A title that already names the site (the home page's) is used as given.
+  const fullTitle = title.includes(SITE_NAME) ? title : `${title} · ${SITE_NAME}`;
   const url = `${SITE_URL}${path}`;
 
   return (

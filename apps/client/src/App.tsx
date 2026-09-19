@@ -11,6 +11,7 @@ import { AdminLayout } from './layouts/AdminLayout';
 import { RequireAuth } from './routes/RequireAuth';
 import { ToastContainer } from './components/ui/ToastContainer';
 import { RouteLoading } from './components/ui/RouteLoading';
+import { SiteFavicon } from './components/ui/SiteFavicon';
 import { DoorOverlay, useDoorTransition } from './components/transition/DoorTransition';
 
 // Public Pages — lazy-loaded so each route only ships the JS it needs.
@@ -158,6 +159,7 @@ export default function App() {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
+          <SiteFavicon />
           <AnimatedRoutes />
           <ToastContainer />
         </BrowserRouter>

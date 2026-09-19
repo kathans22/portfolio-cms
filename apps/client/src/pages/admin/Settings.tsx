@@ -9,6 +9,7 @@ import { useToast } from '../../hooks/useToast';
 import { apiFetch } from '../../lib/api';
 import { Shield, User, KeyRound } from 'lucide-react';
 import { ProfilePhotoManager } from '../../components/admin/ProfilePhotoManager';
+import { FaviconManager } from '../../components/admin/FaviconManager';
 
 interface UpdateProfileResult {
   data: { id: string; name: string; email: string };
@@ -62,10 +63,12 @@ export default function Settings() {
     <div className="space-y-6 text-slate-100">
       <header className="mb-8">
         <h1 className="text-3xl font-extrabold text-white">System Settings</h1>
-        <p className="text-slate-400 text-sm">Update your home page photo, profile and password.</p>
+        <p className="text-slate-400 text-sm">Update your home page photo, favicon, profile and password.</p>
       </header>
 
       <ProfilePhotoManager />
+
+      <FaviconManager />
 
       <div className="bg-slate-900 border border-slate-800 p-8 rounded-xl max-w-xl space-y-6">
         <h2 className="text-lg font-bold border-b border-slate-800 pb-3 flex items-center gap-2 text-white">

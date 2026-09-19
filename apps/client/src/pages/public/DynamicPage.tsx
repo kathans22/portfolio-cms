@@ -6,7 +6,7 @@ import { sectionRegistry } from '../../components/sections/registry';
 import { Breadcrumbs, Crumb } from '../../components/public/Breadcrumbs';
 import { FileQuestion } from 'lucide-react';
 
-const SITE_NAME = 'Kathan — Portfolio';
+const SITE_NAME = 'Kathan Shah';
 const DEFAULT_DESCRIPTION =
   'Full-stack engineer and solutions architect building production-grade web, AI, and data platforms.';
 const SITE_URL = typeof window !== 'undefined' ? window.location.origin : '';
@@ -28,7 +28,7 @@ export default function DynamicPage({ page }: DynamicPageProps) {
   return (
     <div className="min-h-screen text-slate-700 dark:text-slate-100 pt-24 pb-16">
       <Helmet>
-        <title>{title === SITE_NAME ? title : `${title} · ${SITE_NAME}`}</title>
+        <title>{title.includes(SITE_NAME) ? title : `${title} · ${SITE_NAME}`}</title>
         <meta name="description" content={description} />
         <link rel="canonical" href={canonical} />
         {page.noIndex && <meta name="robots" content="noindex" />}

@@ -36,6 +36,7 @@ import analyticsRouter from './modules/analytics/routes';
 import resumeRouter from './modules/resume/routes';
 import adminResumeRouter from './modules/resume/adminRoutes';
 import profilePhotoRouter from './modules/profilePhoto/routes';
+import { publicRouter as siteSettingsRouter, adminRouter as adminSiteSettingsRouter } from './modules/siteSettings/routes';
 
 import { errorHandler } from './middleware/errorHandler';
 import { rateLimiter } from './middleware/rateLimiter';
@@ -120,6 +121,8 @@ app.use('/api/v1/analytics', analyticsRouter);
 app.use('/api/v1/resume', resumeRouter);
 app.use('/api/v1/admin/resume', adminResumeRouter);
 app.use('/api/v1/profile-photo', profilePhotoRouter);
+app.use('/api/v1/site-settings', siteSettingsRouter);
+app.use('/api/v1/admin/site-settings', adminSiteSettingsRouter);
 
 // Health check endpoint — does a real MongoDB round-trip (not just a readyState
 // check) so it doubles as a keep-alive ping for a free-tier Atlas cluster, and Render
