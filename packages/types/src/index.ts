@@ -41,6 +41,8 @@ export interface Project {
   coverImageUrl?: string;
   gallery: ProjectImage[];
   featured: boolean;
+  /** Freelance / client work, as opposed to a personal or employer project. */
+  isClientProject?: boolean;
   order: number;
   status: ContentStatus;
   metaTitle?: string;
@@ -207,7 +209,7 @@ export interface Resume {
   label?: string;
   fileUrl: string;
   originalName: string;
-  provider: 'local' | 'cloudinary';
+  provider: 'local' | 'cloudinary' | 'drive';
   fileSize?: number;
   isActive: boolean;
   createdAt: string;
@@ -218,6 +220,9 @@ export interface Resume {
 // the public site needs. Storage keys and inactive versions never cross this boundary.
 export interface PublicResume {
   fileUrl: string;
+  // Set for a Google Drive resume: an <iframe>-embeddable address. Uploaded PDFs are
+  // embedded from /resume/file instead.
+  embedUrl?: string;
   label?: string;
   originalName: string;
   updatedAt: string;

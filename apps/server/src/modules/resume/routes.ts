@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
+import { drivePreviewUrl, driveDownloadUrl } from '@portfolio/shared';
 import { errorBody } from '../../utils/apiError';
 import { logger } from '../../utils/logger';
 import { UPLOADS_DIR } from '../../config/paths';
@@ -33,6 +34,9 @@ router.get('/file', async (_req: Request, res: Response) => {
   try {
     const active = await Resume.findOne({ isActive: true });
     if (!active) return res.status(404).json(errorBody('NOT_FOUND', 'No resume is available'));
+
+    // A Drive resume is embedded straight from Drive's own preview page; nothing to proxy.
+    if (active.provider === 'drive') return res.redirect(302, drivePreviewUrl(active.storageKey));
 
     res.removeHeader('X-Frame-Options');
     res.removeHeader('Content-Security-Policy');
@@ -73,6 +77,8 @@ router.get('/download', async (req: Request, res: Response) => {
   try {
     const active = await Resume.findOne({ isActive: true });
     if (!active) return res.status(404).json(errorBody('NOT_FOUND', 'No resume is available'));
+
+    if (active.provider === 'drive') return res.redirect(302, driveDownloadUrl(active.storageKey));
 
     // A local-provider URL is relative to this API; make it absolute so the redirect
     // resolves when the client sits on a different origin.

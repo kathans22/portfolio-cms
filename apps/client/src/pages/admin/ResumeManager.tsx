@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Resume } from '@portfolio/types';
 import { apiFetch } from '../../lib/api';
-import { Upload, CheckCircle2, Circle, Trash2, ExternalLink, Pencil, AlertCircle, FileText } from 'lucide-react';
+import { Link2, Upload, CheckCircle2, Circle, Trash2, ExternalLink, Pencil, AlertCircle, FileText } from 'lucide-react';
 
 function formatSize(bytes?: number) {
   if (!bytes) return '—';
@@ -18,6 +18,8 @@ export default function ResumeManager() {
   const queryClient = useQueryClient();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [driveUrl, setDriveUrl] = useState('');
+  const [linking, setLinking] = useState(false);
 
   const { data: resumes } = useQuery<Resume[]>({
     queryKey: ['adminResumes'],
@@ -81,6 +83,26 @@ export default function ResumeManager() {
     }
   };
 
+  const handleLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!driveUrl.trim()) return;
+    setLinking(true);
+    setError('');
+    try {
+      const res = await apiFetch('/admin/resume/link', { method: 'POST', body: JSON.stringify({ url: driveUrl.trim() }) });
+      if (res.ok) {
+        setDriveUrl('');
+        invalidate();
+      } else {
+        setError((await res.json()).error?.message || 'Could not add that link');
+      }
+    } catch {
+      setError('Connection failure saving the link.');
+    } finally {
+      setLinking(false);
+    }
+  };
+
   const handleRename = (resume: Resume) => {
     const label = prompt('Label for this resume (helps you tell versions apart):', resume.label ?? '');
     if (label === null) return;
@@ -115,6 +137,24 @@ export default function ResumeManager() {
           <input type="file" accept="application/pdf,.pdf" className="hidden" onChange={handleUpload} disabled={uploading} />
         </label>
       </header>
+
+      <form onSubmit={handleLink} className="flex gap-2">
+        <input
+          type="url"
+          value={driveUrl}
+          onChange={(e) => setDriveUrl(e.target.value)}
+          placeholder="Google Drive PDF link (shared as “Anyone with the link → Viewer”)"
+          aria-label="Google Drive resume link"
+          className="input-field flex-grow"
+        />
+        <button
+          type="submit"
+          disabled={linking || !driveUrl.trim()}
+          className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white text-sm font-semibold rounded-lg flex items-center gap-1.5 border border-slate-700"
+        >
+          <Link2 size={16} /> {linking ? 'Checking…' : 'Add Drive link'}
+        </button>
+      </form>
 
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs py-3 px-4 rounded-lg flex items-center gap-2">

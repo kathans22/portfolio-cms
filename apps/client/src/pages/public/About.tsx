@@ -24,14 +24,6 @@ const SUMMARY =
   'Skilled in Node.js, PostgreSQL, SQL optimization, ETL/ELT pipelines, and RESTful API ' +
   'development across high-volume transactional workloads.';
 
-/** Numbers pulled from the résumé's own achievements — nothing rounded up. */
-const HIGHLIGHTS = [
-  { value: '1.4M+', label: 'orders served' },
-  { value: '30K+', label: 'products' },
-  { value: '20+', label: 'REST APIs' },
-  { value: '3×', label: 'API load capacity' },
-];
-
 function fmtMonth(value?: string) {
   if (!value) return '';
   return new Date(value).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
@@ -225,7 +217,7 @@ export default function About() {
               <a href="#resume" className="btn-ghost">
                 <ArrowDown size={15} /> Jump to résumé
               </a>
-              <a href={FILE_URL} target="_blank" rel="noopener noreferrer" className="btn-ghost">
+              <a href={resume.embedUrl ?? FILE_URL} target="_blank" rel="noopener noreferrer" className="btn-ghost">
                 <Maximize2 size={15} /> Full screen
               </a>
               <a href={DOWNLOAD_URL} target="_blank" rel="noopener noreferrer" className="btn-primary">
@@ -245,19 +237,6 @@ export default function About() {
         <p className="max-w-3xl text-lg leading-relaxed text-slate-600 dark:text-slate-300 sm:text-xl">
           {SUMMARY}
         </p>
-
-        <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-slate-200 bg-slate-200 dark:border-slate-800 dark:bg-slate-800 sm:grid-cols-4">
-          {HIGHLIGHTS.map((h) => (
-            <div key={h.label} className="bg-slate-50 px-5 py-5 dark:bg-slate-950">
-              <dt className="font-heading text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-                {h.value}
-              </dt>
-              <dd className="mt-1 font-mono text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                {h.label}
-              </dd>
-            </div>
-          ))}
-        </dl>
       </motion.section>
 
       {/* 2 — Education. */}
@@ -335,10 +314,22 @@ export default function About() {
         {resumeLoading ? (
           <div className="h-[80vh] w-full animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-900" />
         ) : resume ? (
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-soft dark:border-slate-800 dark:bg-slate-900">
-            <object data={FILE_URL} type="application/pdf" className="h-[85vh] w-full" aria-label={`${NAME} résumé`}>
-              <iframe title={`${NAME} résumé`} src={FILE_URL} className="h-[85vh] w-full border-0" />
-            </object>
+          <div
+            className={`overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-soft dark:border-slate-800 dark:bg-slate-900${
+              resume.embedUrl ? ' p-3 sm:p-6' : ''
+            }`}
+          >
+            {resume.embedUrl ? (
+              <iframe
+                title={`${NAME} résumé`}
+                src={resume.embedUrl}
+                className="h-[85vh] w-full rounded-lg border-0"
+              />
+            ) : (
+              <object data={FILE_URL} type="application/pdf" className="h-[85vh] w-full" aria-label={`${NAME} résumé`}>
+                <iframe title={`${NAME} résumé`} src={FILE_URL} className="h-[85vh] w-full border-0" />
+              </object>
+            )}
           </div>
         ) : (
           <div className="flex min-h-[40vh] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 p-16 text-center dark:border-slate-700">

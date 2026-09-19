@@ -5,6 +5,7 @@ import { SECTION_TYPES, SECTION_TYPE_KEYS, SectionType } from './sectionTypes';
 
 export * from './contentBlocks';
 export * from './domains';
+export * from './driveLinks';
 export * from './sectionTypes';
 
 // Mongo ObjectId string (24-char hex) — replaces the old cuid id format.
@@ -47,6 +48,7 @@ export const projectSchema = z.object({
   coverImageUrl: z.string().url('Please enter a valid cover image URL').optional().or(z.literal('')),
   gallery: z.array(projectImageSchema).default([]),
   featured: z.boolean().default(false),
+  isClientProject: z.boolean().default(false),
   order: z.number().int().default(0),
   status: z.enum(['DRAFT', 'PUBLISHED']).default('PUBLISHED'),
   metaTitle: z.string().optional().or(z.literal('')),
@@ -481,3 +483,14 @@ export const resumeUpdateSchema = z.object({
   label: resumeLabelSchema,
 });
 export type ResumeUpdateInput = z.infer<typeof resumeUpdateSchema>;
+
+export const faviconLinkSchema = z.object({
+  url: z.string().trim().url('Please paste a valid link'),
+});
+export type FaviconLinkInput = z.infer<typeof faviconLinkSchema>;
+
+export const resumeLinkSchema = z.object({
+  url: z.string().trim().url('Please enter a valid link'),
+  label: resumeLabelSchema,
+});
+export type ResumeLinkInput = z.infer<typeof resumeLinkSchema>;

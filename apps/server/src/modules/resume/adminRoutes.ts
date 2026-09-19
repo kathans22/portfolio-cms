@@ -5,7 +5,15 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { requireAdmin, AuthenticatedRequest } from '../../middleware/requireAdmin';
 import { validateRequest } from '../../middleware/validateRequest';
-import { resumeUpdateSchema, ResumeUpdateInput } from '@portfolio/shared';
+import {
+  resumeUpdateSchema,
+  ResumeUpdateInput,
+  resumeLinkSchema,
+  ResumeLinkInput,
+  extractDriveFileId,
+  driveDownloadUrl,
+  driveViewUrl,
+} from '@portfolio/shared';
 import { errorBody } from '../../utils/apiError';
 import { logger } from '../../utils/logger';
 import { uploadToCloud, deleteFromCloud } from '../../services/cloudinary';
@@ -135,6 +143,66 @@ router.post('/upload', acceptPdf, validateRequest(resumeUpdateSchema), async (re
   }
 });
 
+/**
+ * Confirms a Drive file is publicly readable AND a PDF. A file that isn't shared as
+ * "Anyone with the link" comes back as an HTML sign-in page, so the leading bytes —
+ * not the status code — are what tell the two apart.
+ */
+async function driveFileIsPublicPdf(id: string): Promise<boolean> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10_000);
+  try {
+    const res = await fetch(driveDownloadUrl(id), { redirect: 'follow', signal: controller.signal });
+    if (!res.ok || !res.body) return false;
+    const reader = res.body.getReader();
+    const { value } = await reader.read();
+    await reader.cancel().catch(() => undefined);
+    return !!value && Buffer.from(value.subarray(0, 5)).toString('latin1') === '%PDF-';
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Admin: POST /api/v1/admin/resume/link — register a Google Drive PDF instead of uploading.
+router.post('/link', validateRequest(resumeLinkSchema), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { url, label } = req.body as ResumeLinkInput;
+    const id = extractDriveFileId(url);
+    if (!id) {
+      return res
+        .status(400)
+        .json(errorBody('VALIDATION_ERROR', 'That is not a Google Drive file link (drive.google.com/file/d/…)'));
+    }
+    if (!(await driveFileIsPublicPdf(id))) {
+      return res
+        .status(400)
+        .json(
+          errorBody(
+            'VALIDATION_ERROR',
+            'Could not read a PDF at that link. Share the file as "Anyone with the link → Viewer" and make sure it is a PDF.'
+          )
+        );
+    }
+
+    const isFirst = (await Resume.countDocuments()) === 0;
+    const resume = await Resume.create({
+      label: (label || '').trim() || undefined,
+      fileUrl: driveViewUrl(id),
+      originalName: 'Google Drive PDF',
+      provider: 'drive',
+      storageKey: id,
+      mimeType: 'application/pdf',
+      isActive: isFirst,
+    });
+    res.status(201).json(resume);
+  } catch (error) {
+    logger.error({ err: error }, 'Resume link failed');
+    res.status(500).json(errorBody('INTERNAL_ERROR', 'Failed to save the resume link'));
+  }
+});
+
 // Admin: PATCH /api/v1/admin/resume/:id — rename only.
 router.patch('/:id', validateRequest(resumeUpdateSchema), async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -188,7 +256,8 @@ router.delete('/:id', async (req: AuthenticatedRequest, res: Response) => {
     const rt = (resume.storageResourceType === 'raw' || resume.storageResourceType === 'video'
       ? resume.storageResourceType
       : 'image') as 'image' | 'raw' | 'video';
-    await deleteFromCloud(resume.provider, resume.storageKey, rt);
+    // A Drive link owns no stored file — only the row is removed.
+    if (resume.provider !== 'drive') await deleteFromCloud(resume.provider, resume.storageKey, rt);
     await resume.deleteOne();
     res.status(204).end();
   } catch (error) {

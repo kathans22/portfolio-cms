@@ -1,4 +1,5 @@
 import type { PublicResume } from '@portfolio/types';
+import { drivePreviewUrl } from '@portfolio/shared';
 import { Resume, ResumeDoc } from './resume.model';
 
 /**
@@ -29,6 +30,7 @@ export async function activateResume(id: string): Promise<ResumeDoc | null> {
 export function toPublicResume(doc: ResumeDoc): PublicResume {
   return {
     fileUrl: doc.fileUrl,
+    embedUrl: doc.provider === 'drive' ? drivePreviewUrl(doc.storageKey) : undefined,
     label: doc.label || undefined,
     originalName: doc.originalName,
     updatedAt: doc.updatedAt.toISOString(),

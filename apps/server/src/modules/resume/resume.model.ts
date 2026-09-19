@@ -11,8 +11,8 @@ export interface ResumeAttrs {
   label?: string;
   fileUrl: string;
   originalName: string;
-  provider: 'local' | 'cloudinary';
-  storageKey: string; // local filename, or Cloudinary public_id — needed to delete later
+  provider: 'local' | 'cloudinary' | 'drive';
+  storageKey: string; // local filename, Cloudinary public_id, or Drive file id — nothing is stored for 'drive'
   // The Cloudinary resource_type the file landed under ('image' for PDFs, usually).
   // destroy() defaults to 'image' and no-ops on a mismatch, so it is stored, not guessed.
   storageResourceType?: string;
@@ -28,7 +28,7 @@ const ResumeSchema = new Schema<ResumeAttrs>(
     label: { type: String, trim: true },
     fileUrl: { type: String, required: true },
     originalName: { type: String, required: true },
-    provider: { type: String, enum: ['local', 'cloudinary'], required: true },
+    provider: { type: String, enum: ['local', 'cloudinary', 'drive'], required: true },
     storageKey: { type: String, required: true },
     storageResourceType: { type: String },
     mimeType: { type: String },
