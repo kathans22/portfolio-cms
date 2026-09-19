@@ -125,7 +125,7 @@ export function ContentBlockEditor({ value, onChange }: ContentBlockEditorProps)
 
           {block.type === 'video' && (
             <div className="space-y-3">
-              <input type="text" value={block.url} onChange={(e) => updateBlock(index, { url: e.target.value })} className="input-field" placeholder="Video URL (YouTube, Vimeo, or direct file)" />
+              <input type="text" value={block.url} onChange={(e) => updateBlock(index, { url: e.target.value })} className="input-field" placeholder="Video URL (YouTube, Vimeo, Google Drive link, or direct file)" />
               <input type="text" value={block.caption || ''} onChange={(e) => updateBlock(index, { caption: e.target.value })} className="input-field" placeholder="Caption (optional)" />
             </div>
           )}

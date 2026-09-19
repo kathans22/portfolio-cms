@@ -152,7 +152,7 @@ export default function Certifications() {
                 >
                   <div className="flex items-start gap-4 mb-4">
                     {cert.issuerLogoUrl ? (
-                      <img src={cert.issuerLogoUrl} alt="" loading="lazy" className="w-12 h-12 rounded-lg object-contain bg-white p-1 shrink-0" />
+                      <img src={cert.issuerLogoUrl} referrerPolicy="no-referrer" alt="" loading="lazy" className="w-12 h-12 rounded-lg object-contain bg-white p-1 shrink-0" />
                     ) : (
                       <div className="w-12 h-12 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0">
                         <BadgeCheck className="text-indigo-500" size={22} aria-hidden="true" />

@@ -1,5 +1,6 @@
 import React, { useId, useState } from 'react';
 import { Upload, Loader2 } from 'lucide-react';
+import { normalizeImageUrl } from '@portfolio/shared';
 import { apiFetch } from '../../lib/api';
 
 interface ImageUploadFieldProps {
@@ -41,14 +42,15 @@ export function ImageUploadField({ value, onChange, label = 'Image URL', showPre
     <div>
       {label && <label htmlFor={inputId} className="text-slate-400 text-xs font-semibold block mb-2">{label}</label>}
       <div className="flex gap-2">
-        <input id={inputId} type="text" value={value} onChange={(e) => onChange(e.target.value)} className="flex-grow input-field" placeholder="https://..." />
+        <input id={inputId} type="text" value={value} onChange={(e) => onChange(normalizeImageUrl(e.target.value))} className="flex-grow input-field" placeholder="Image URL or Google Drive share link" />
         <label className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg flex items-center justify-center cursor-pointer border border-slate-700">
           {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
           <input type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
         </label>
       </div>
+      <p className="mt-1 text-[11px] text-slate-500">Drive links must be shared as “Anyone with the link → Viewer”.</p>
       {showPreview && value && (
-        <img src={value} alt="" className="mt-3 h-24 rounded-lg border border-slate-800 object-cover" />
+        <img src={value} referrerPolicy="no-referrer" alt="" className="mt-3 h-24 rounded-lg border border-slate-800 object-cover" />
       )}
     </div>
   );

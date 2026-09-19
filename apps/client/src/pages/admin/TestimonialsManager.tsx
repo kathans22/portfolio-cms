@@ -130,7 +130,7 @@ export default function TestimonialsManager() {
             <p className="text-slate-300 text-sm italic mb-4 flex-grow line-clamp-4">&quot;{t.quote}&quot;</p>
             <div className="flex items-center gap-3 mb-4">
               {t.avatarUrl ? (
-                <img src={t.avatarUrl} alt="" loading="lazy" className="w-10 h-10 rounded-full object-cover" />
+                <img src={t.avatarUrl} referrerPolicy="no-referrer" alt="" loading="lazy" className="w-10 h-10 rounded-full object-cover" />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center font-bold text-indigo-500">{t.name[0]}</div>
               )}

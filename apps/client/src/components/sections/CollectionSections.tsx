@@ -91,7 +91,7 @@ export function ProjectListSection(props: SectionProps) {
             className="bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 rounded-xl overflow-hidden flex flex-col"
           >
             {!compact && project.coverImageUrl && (
-              <img src={project.coverImageUrl} alt="" loading="lazy" className="h-44 w-full object-cover" />
+              <img src={project.coverImageUrl} referrerPolicy="no-referrer" alt="" loading="lazy" className="h-44 w-full object-cover" />
             )}
             <div className="p-6 flex flex-col flex-grow">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{project.title}</h3>
@@ -183,7 +183,7 @@ export function CertificationListSection(props: SectionProps) {
                 className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-800 px-3 py-2"
               >
                 {cert.issuerLogoUrl ? (
-                  <img src={cert.issuerLogoUrl} alt="" loading="lazy" className="w-7 h-7 object-contain bg-white rounded p-0.5" />
+                  <img src={cert.issuerLogoUrl} referrerPolicy="no-referrer" alt="" loading="lazy" className="w-7 h-7 object-contain bg-white rounded p-0.5" />
                 ) : (
                   <BadgeCheck size={16} className="text-indigo-500" aria-hidden="true" />
                 )}
@@ -351,7 +351,7 @@ export function TestimonialListSection(props: SectionProps) {
             <MessageSquare size={20} className="text-indigo-500 mb-4" aria-hidden="true" />
             <blockquote className="text-slate-600 dark:text-slate-300 italic flex-grow">&quot;{t.quote}&quot;</blockquote>
             <figcaption className="flex items-center gap-3 mt-5">
-              {t.avatarUrl && <img src={t.avatarUrl} alt="" loading="lazy" className="w-10 h-10 rounded-full object-cover" />}
+              {t.avatarUrl && <img src={t.avatarUrl} referrerPolicy="no-referrer" alt="" loading="lazy" className="w-10 h-10 rounded-full object-cover" />}
               <span>
                 <span className="block font-bold text-sm text-slate-900 dark:text-white">{t.name}</span>
                 <span className="block text-xs text-slate-500">{t.role}{t.company ? ` at ${t.company}` : ''}</span>

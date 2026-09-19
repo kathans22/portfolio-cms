@@ -46,7 +46,7 @@ export function GalleryEditor({ value, onChange }: GalleryEditorProps) {
       <div className="space-y-3">
         {images.map((img, index) => (
           <div key={img.id ?? index} className="bg-slate-950 border border-slate-800 rounded-lg p-4 flex gap-4">
-            {img.url && <img src={img.url} alt="" className="w-20 h-20 object-cover rounded-lg border border-slate-800 shrink-0" />}
+            {img.url && <img src={img.url} referrerPolicy="no-referrer" alt="" className="w-20 h-20 object-cover rounded-lg border border-slate-800 shrink-0" />}
             <div className="flex-grow space-y-2">
               <ImageUploadField value={img.url} onChange={(url) => update(index, { url })} label="" showPreview={false} />
               <input type="text" value={img.caption || ''} onChange={(e) => update(index, { caption: e.target.value })} className="input-field" placeholder="Caption (optional)" />

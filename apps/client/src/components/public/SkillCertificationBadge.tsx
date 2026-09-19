@@ -37,7 +37,7 @@ export function SkillCertificationBadge({ skillName, certifications }: SkillCert
           className="inline-flex items-center gap-1 align-middle rounded-full border border-emerald-500/25 bg-emerald-500/10 px-1.5 py-0.5 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 transition-colors"
         >
           {primary.issuerLogoUrl ? (
-            <img src={primary.issuerLogoUrl} alt="" loading="lazy" className="w-3.5 h-3.5 rounded-sm object-contain" />
+            <img src={primary.issuerLogoUrl} referrerPolicy="no-referrer" alt="" loading="lazy" className="w-3.5 h-3.5 rounded-sm object-contain" />
           ) : (
             <BadgeCheck size={12} aria-hidden="true" />
           )}
@@ -61,7 +61,7 @@ export function SkillCertificationBadge({ skillName, certifications }: SkillCert
               <li key={cert.id} className="border-b border-slate-100 dark:border-slate-800 pb-3 last:border-0 last:pb-0">
                 <div className="flex items-start gap-2">
                   {cert.issuerLogoUrl ? (
-                    <img src={cert.issuerLogoUrl} alt="" loading="lazy" className="w-6 h-6 rounded object-contain bg-white shrink-0" />
+                    <img src={cert.issuerLogoUrl} referrerPolicy="no-referrer" alt="" loading="lazy" className="w-6 h-6 rounded object-contain bg-white shrink-0" />
                   ) : (
                     <BadgeCheck size={14} className="text-emerald-500 shrink-0 mt-0.5" aria-hidden="true" />
                   )}

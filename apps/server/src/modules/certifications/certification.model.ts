@@ -1,6 +1,10 @@
 import { Schema, model, HydratedDocument, Types } from 'mongoose';
+import { normalizeImageUrl } from '@portfolio/shared';
 import { withJsonId } from '../../config/mongooseSchemaOptions';
 import { invalidatesResolveCache } from '../resolve/resolveCache';
+
+// Turns a pasted Drive share link into a direct image address on every write path.
+const driveImage = (v?: string) => (typeof v === 'string' ? normalizeImageUrl(v.trim()) : v);
 
 const PROJECT_DOMAINS = ['SOFTWARE_DEVELOPMENT', 'AI_ENGINEERING', 'DATA_ENGINEERING'] as const;
 type ProjectDomain = (typeof PROJECT_DOMAINS)[number];
@@ -48,7 +52,7 @@ const CertificationSchema = new Schema<CertificationAttrs>(
   {
     name: { type: String, required: true, trim: true },
     issuingOrganization: { type: String, required: true, trim: true },
-    issuerLogoUrl: String,
+    issuerLogoUrl: { type: String, set: driveImage },
 
     issueDate: { type: Date, required: true },
     expiryDate: { type: Date, default: null },
@@ -56,7 +60,7 @@ const CertificationSchema = new Schema<CertificationAttrs>(
 
     credentialId: String,
     credentialUrl: String, // public verification link
-    certificateImageUrl: String, // badge or certificate scan
+    certificateImageUrl: { type: String, set: driveImage }, // badge or certificate scan
 
     description: String, // what the credential actually covers
 

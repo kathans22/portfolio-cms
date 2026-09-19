@@ -1,6 +1,10 @@
+import { normalizeImageUrl } from '@portfolio/shared';
 import { Schema, model, HydratedDocument, Types } from 'mongoose';
 import { withJsonId } from '../../config/mongooseSchemaOptions';
 import { invalidatesResolveCache } from '../resolve/resolveCache';
+
+// Turns a pasted Drive share link into a direct image address on every write path.
+const driveImage = (v?: string) => (typeof v === 'string' ? normalizeImageUrl(v.trim()) : v);
 
 const PROJECT_DOMAINS = ['SOFTWARE_DEVELOPMENT', 'AI_ENGINEERING', 'DATA_ENGINEERING'] as const;
 
@@ -153,7 +157,7 @@ const PageSchema = new Schema<PageAttrs>(
 
     metaTitle: String,
     metaDescription: String,
-    ogImageUrl: String,
+    ogImageUrl: { type: String, set: driveImage },
     noIndex: { type: Boolean, default: false },
 
     // Content deletion is the one destructive action an admin regrets, and recovery is

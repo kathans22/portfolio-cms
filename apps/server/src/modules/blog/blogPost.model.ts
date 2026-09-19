@@ -1,6 +1,10 @@
+import { normalizeImageUrl } from '@portfolio/shared';
 import { Schema, model, HydratedDocument } from 'mongoose';
 import { withJsonId } from '../../config/mongooseSchemaOptions';
 import { invalidatesResolveCache } from '../resolve/resolveCache';
+
+// Turns a pasted Drive share link into a direct image address on every write path.
+const driveImage = (v?: string) => (typeof v === 'string' ? normalizeImageUrl(v.trim()) : v);
 
 const PROJECT_DOMAINS = ['SOFTWARE_DEVELOPMENT', 'AI_ENGINEERING', 'DATA_ENGINEERING'] as const;
 type ProjectDomain = (typeof PROJECT_DOMAINS)[number];
@@ -30,14 +34,14 @@ const BlogPostSchema = new Schema<BlogPostAttrs>(
     excerpt: { type: String, required: true },
     content: { type: String, required: true },
     contentBlocks: { type: Schema.Types.Mixed, default: [] },
-    coverImageUrl: String,
+    coverImageUrl: { type: String, set: driveImage },
     tags: { type: [String], default: [] },
     domains: { type: [String], enum: PROJECT_DOMAINS, default: [] },
     status: { type: String, enum: ['DRAFT', 'PUBLISHED'], default: 'DRAFT' },
     publishedAt: Date,
     metaTitle: String,
     metaDescription: String,
-    ogImageUrl: String,
+    ogImageUrl: { type: String, set: driveImage },
   },
   withJsonId({ timestamps: true })
 );

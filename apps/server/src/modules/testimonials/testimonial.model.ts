@@ -1,6 +1,10 @@
+import { normalizeImageUrl } from '@portfolio/shared';
 import { Schema, model, HydratedDocument } from 'mongoose';
 import { withJsonId } from '../../config/mongooseSchemaOptions';
 import { invalidatesResolveCache } from '../resolve/resolveCache';
+
+// Turns a pasted Drive share link into a direct image address on every write path.
+const driveImage = (v?: string) => (typeof v === 'string' ? normalizeImageUrl(v.trim()) : v);
 
 export interface TestimonialAttrs {
   name: string;
@@ -35,7 +39,7 @@ const TestimonialSchema = new Schema<TestimonialAttrs>(
     role: { type: String, required: true },
     company: String,
     quote: { type: String, required: true },
-    avatarUrl: String,
+    avatarUrl: { type: String, set: driveImage },
     order: { type: Number, default: 0 },
     // Defaults to APPROVED so the admin's own create/update paths behave exactly as
     // before; the public submission route sets PENDING explicitly.

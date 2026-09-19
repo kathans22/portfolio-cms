@@ -36,7 +36,7 @@ function Card({ testimonial }: { testimonial: Testimonial }) {
       <figcaption className="mt-6 flex items-center gap-3.5 border-t border-slate-100 pt-5 dark:border-slate-800/70">
         {testimonial.avatarUrl ? (
           <img
-            src={testimonial.avatarUrl}
+            src={testimonial.avatarUrl} referrerPolicy="no-referrer"
             alt=""
             loading="lazy"
             className="h-11 w-11 rounded-full object-cover"

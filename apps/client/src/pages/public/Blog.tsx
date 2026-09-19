@@ -121,7 +121,7 @@ export default function Blog() {
             <Link to={`/blog/${blog.slug}`} className="flex flex-col flex-grow">
               {blog.coverImageUrl && (
                 <div className="h-48 overflow-hidden">
-                  <img src={blog.coverImageUrl} alt="" loading="lazy" className="w-full h-full object-cover" />
+                  <img src={blog.coverImageUrl} referrerPolicy="no-referrer" alt="" loading="lazy" className="w-full h-full object-cover" />
                 </div>
               )}
               <div className="p-6 flex flex-col flex-grow">

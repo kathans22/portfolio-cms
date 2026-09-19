@@ -74,7 +74,7 @@ export default function BlogPost() {
       </button>
 
       {post.coverImageUrl && (
-        <img src={post.coverImageUrl} alt="" className="w-full max-h-[360px] object-cover rounded-xl mb-8 border border-slate-200 dark:border-slate-800" />
+        <img src={post.coverImageUrl} referrerPolicy="no-referrer" alt="" className="w-full max-h-[360px] object-cover rounded-xl mb-8 border border-slate-200 dark:border-slate-800" />
       )}
 
       <span className="text-indigo-600 dark:text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-2 block">

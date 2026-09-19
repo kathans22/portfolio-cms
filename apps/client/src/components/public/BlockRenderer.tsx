@@ -1,14 +1,18 @@
 import React from 'react';
 import { Highlight, themes } from 'prism-react-renderer';
 import { Info, AlertTriangle, TrendingUp } from 'lucide-react';
+import { extractDriveFileId, drivePreviewUrl, normalizeImageUrl } from '@portfolio/shared';
 import type { ContentBlock } from '@portfolio/shared';
 import { renderMarkdown } from '../../lib/renderMarkdown';
 
 function isEmbeddableVideo(url: string) {
-  return /youtube\.com|youtu\.be|vimeo\.com/.test(url);
+  return /youtube\.com|youtu\.be|vimeo\.com/.test(url) || extractDriveFileId(url) !== null;
 }
 
 function toEmbedUrl(url: string) {
+  // A Drive video plays in Drive's own embeddable preview player.
+  const driveId = extractDriveFileId(url);
+  if (driveId) return drivePreviewUrl(driveId);
   const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
   if (youtubeMatch) return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
   const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
@@ -45,7 +49,8 @@ function Block({ block }: { block: ContentBlock }) {
       return (
         <figure className="my-6">
           <img
-            src={block.url}
+            src={normalizeImageUrl(block.url)}
+            referrerPolicy="no-referrer"
             alt={block.altText || block.caption || ''}
             className="w-full rounded-xl border border-slate-200 dark:border-slate-800"
           />
@@ -58,7 +63,7 @@ function Block({ block }: { block: ContentBlock }) {
     case 'diagram':
       return (
         <figure className="my-6 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
-          <img src={block.url} alt={block.caption || 'Diagram'} className="w-full rounded-lg" />
+          <img src={normalizeImageUrl(block.url)} referrerPolicy="no-referrer" alt={block.caption || 'Diagram'} className="w-full rounded-lg" />
           {block.caption && (
             <figcaption className="text-center text-xs text-slate-500 dark:text-slate-500 mt-2">{block.caption}</figcaption>
           )}

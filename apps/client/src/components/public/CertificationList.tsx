@@ -49,7 +49,7 @@ export function CertificationList({ layoutVariant = 'compact', limit = 6 }: Cert
               className="group flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 px-3 py-2 hover:border-indigo-400 dark:hover:border-indigo-500/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 transition-colors"
             >
               {cert.issuerLogoUrl ? (
-                <img src={cert.issuerLogoUrl} alt="" loading="lazy" className="w-7 h-7 rounded object-contain bg-white p-0.5 shrink-0" />
+                <img src={cert.issuerLogoUrl} referrerPolicy="no-referrer" alt="" loading="lazy" className="w-7 h-7 rounded object-contain bg-white p-0.5 shrink-0" />
               ) : (
                 <span className="w-7 h-7 rounded bg-indigo-500/10 flex items-center justify-center shrink-0">
                   <BadgeCheck size={15} className="text-indigo-500" aria-hidden="true" />
