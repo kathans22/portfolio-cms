@@ -131,7 +131,7 @@ export default function Home() {
 
   return (
     <div className="relative overflow-hidden min-h-screen text-slate-700 dark:text-slate-100 pb-20">
-      <Seo title="Kathan — Portfolio" path="/" personSchema />
+      <Seo title="Kathan Shah | Portfolio" path="/" personSchema />
 
       <Hero />
 
@@ -141,10 +141,14 @@ export default function Home() {
 
       {/* About blurb */}
       <motion.section {...fadeInUp} className="container-wide py-20 border-t border-slate-200 dark:border-slate-900">
-        <p className="max-w-5xl text-xl md:text-3xl leading-relaxed text-slate-700 dark:text-slate-200 font-heading font-medium tracking-tight">
-          I build enterprise ERP platforms and multi-tenant commerce systems — one of them
-          carrying 1.4M+ orders and 30,000+ products — and the interfaces people actually
-          use to run them.
+        <h2 className="max-w-4xl font-heading text-4xl font-bold leading-[1.05] tracking-tight text-slate-900 dark:text-white md:text-6xl">
+          Got a messy problem?{' '}
+          <span className="text-indigo-600 dark:text-indigo-400">I ship the clean solution.</span>
+        </h2>
+        <p className="mt-8 max-w-3xl text-lg md:text-2xl leading-relaxed text-slate-600 dark:text-slate-300 font-heading font-medium tracking-tight">
+          Full-stack developer building ERP platforms and multi-tenant commerce systems.
+          My latest carries 1.4M+ orders and 30,000+ products, and I built the
+          interfaces the team uses to run it.
         </p>
         <Link to="/about" className="mt-6 inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-indigo-600 dark:text-indigo-400 hover:gap-2.5 transition-all">
           More about me &rarr;
@@ -177,7 +181,7 @@ export default function Home() {
               >
                 {blog.coverImageUrl && (
                   <div className="h-48 overflow-hidden">
-                    <img src={blog.coverImageUrl} alt="" loading="lazy" className="w-full h-full object-cover" />
+                    <img src={blog.coverImageUrl} referrerPolicy="no-referrer" alt="" loading="lazy" className="w-full h-full object-cover" />
                   </div>
                 )}
                 <div className="p-6 flex flex-col flex-grow">

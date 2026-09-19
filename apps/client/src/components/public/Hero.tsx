@@ -339,10 +339,27 @@ export function Hero() {
             </div>
           </div>
 
-          <p className="mt-7 max-w-md text-base leading-relaxed text-slate-500 dark:text-slate-400 sm:text-lg">
-            I build production-grade web applications end to end — from the
-            interface a person touches to the systems humming behind it, with a
-            soft spot for 3D and motion.
+          <p className="mt-7 max-w-md font-heading text-2xl font-semibold leading-snug tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+            Clean commits. <span className="text-indigo-600 dark:text-indigo-400">Loud results.</span>
+          </p>
+          {/* Three beats revealed in sequence — dream, build, scale — with the last one
+              landing in the accent colour. Static under reduced motion. */}
+          <p
+            aria-label="You dream it. I build it. It scales."
+            className="mt-3 flex flex-wrap gap-x-2 font-heading text-base font-medium text-slate-500 dark:text-slate-400 sm:text-lg"
+          >
+            {['You dream it.', 'I build it.', 'It scales.'].map((beat, i) => (
+              <motion.span
+                key={beat}
+                aria-hidden
+                initial={reduceMotion ? false : { opacity: 0, y: 8, filter: 'blur(4px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                transition={{ duration: 0.5, delay: 0.9 + i * 0.55, ease: [0.22, 1, 0.36, 1] }}
+                className={i === 2 ? 'font-semibold text-indigo-600 dark:text-indigo-400' : undefined}
+              >
+                {beat}
+              </motion.span>
+            ))}
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-3">
@@ -353,17 +370,6 @@ export function Hero() {
               Résumé
             </Link>
           </div>
-
-          <ul className="mt-9 flex flex-wrap gap-2">
-            {['TypeScript', 'React', 'Node.js', 'MongoDB', 'Three.js'].map((t) => (
-              <li
-                key={t}
-                className="rounded-md border border-slate-200 bg-white/60 px-2.5 py-1 font-mono text-[11px] text-slate-600 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-400"
-              >
-                {t}
-              </li>
-            ))}
-          </ul>
         </motion.div>
 
         {/* ---- 3D stage: stacked windows + floating photo + badges ---- */}
