@@ -1,6 +1,10 @@
 import { Schema, model, HydratedDocument } from 'mongoose';
+import { normalizeImageUrl } from '@portfolio/shared';
 import { withJsonId } from '../../config/mongooseSchemaOptions';
 import { invalidatesResolveCache } from '../resolve/resolveCache';
+
+// Turns a pasted Drive share link into a direct image address on every write path.
+const driveImage = (v?: string) => (typeof v === 'string' ? normalizeImageUrl(v.trim()) : v);
 
 const PROJECT_DOMAINS = ['SOFTWARE_DEVELOPMENT', 'AI_ENGINEERING', 'DATA_ENGINEERING'] as const;
 const PROJECT_STATUSES = ['DRAFT', 'PUBLISHED'] as const;
@@ -29,6 +33,7 @@ export interface ProjectAttrs {
   coverImageUrl?: string;
   gallery: ProjectImageAttrs[];
   featured: boolean;
+  isClientProject: boolean;
   order: number;
   status: ProjectStatus;
   metaTitle?: string;
@@ -40,7 +45,7 @@ export interface ProjectAttrs {
 
 const ProjectImageSchema = new Schema<ProjectImageAttrs>(
   {
-    url: { type: String, required: true },
+    url: { type: String, required: true, set: driveImage },
     caption: String,
     altText: String,
     order: { type: Number, default: 0 },
@@ -60,14 +65,15 @@ const ProjectSchema = new Schema<ProjectAttrs>(
     role: String,
     liveUrl: String,
     repoUrl: String,
-    coverImageUrl: String,
+    coverImageUrl: { type: String, set: driveImage },
     gallery: { type: [ProjectImageSchema], default: [] },
     featured: { type: Boolean, default: false },
+    isClientProject: { type: Boolean, default: false },
     order: { type: Number, default: 0 },
     status: { type: String, enum: PROJECT_STATUSES, default: 'PUBLISHED' },
     metaTitle: String,
     metaDescription: String,
-    ogImageUrl: String,
+    ogImageUrl: { type: String, set: driveImage },
   },
   withJsonId({ timestamps: true })
 );

@@ -65,10 +65,13 @@ export default function ProjectDetail() {
         &larr; Back to Projects
       </button>
       {project.coverImageUrl && (
-        <img src={project.coverImageUrl} alt="" loading="lazy" className="w-full max-h-[400px] object-cover rounded-xl mb-8 border border-slate-200 dark:border-slate-800" />
+        <img src={project.coverImageUrl} referrerPolicy="no-referrer" alt="" loading="lazy" className="w-full max-h-[400px] object-cover rounded-xl mb-8 border border-slate-200 dark:border-slate-800" />
       )}
 
       <div className="flex flex-wrap gap-2 mb-4">
+        {project.isClientProject && (
+          <span className="bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full">Freelance</span>
+        )}
         {project.domains.map((d: ProjectDomain) => (
           <span key={d} className="bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full">
             {PROJECT_DOMAIN_META[d]?.label ?? d}
@@ -96,7 +99,7 @@ export default function ProjectDetail() {
           <div className="grid sm:grid-cols-2 gap-6">
             {[...project.gallery].sort((a, b) => a.order - b.order).map((img) => (
               <figure key={img.id || img.url}>
-                <img src={img.url} alt={img.altText || img.caption || ''} loading="lazy" className="w-full rounded-xl border border-slate-200 dark:border-slate-800" />
+                <img src={img.url} referrerPolicy="no-referrer" alt={img.altText || img.caption || ''} loading="lazy" className="w-full rounded-xl border border-slate-200 dark:border-slate-800" />
                 {img.caption && <figcaption className="text-center text-xs text-slate-500 mt-2">{img.caption}</figcaption>}
               </figure>
             ))}

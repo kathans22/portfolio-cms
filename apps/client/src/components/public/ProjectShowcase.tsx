@@ -87,7 +87,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           {/* ---- artwork window ---- */}
           <div className="relative h-52 overflow-hidden rounded-t-2xl bg-slate-100 dark:bg-slate-950">
             <motion.img
-              src={project.coverImageUrl}
+              src={project.coverImageUrl} referrerPolicy="no-referrer"
               alt=""
               loading="lazy"
               style={reduceMotion ? undefined : { x: imgX, y: imgY }}
@@ -105,6 +105,15 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           >
             {String(index + 1).padStart(2, '0')}
           </span>
+
+          {project.isClientProject && (
+            <span
+              style={{ transform: 'translateZ(72px)' }}
+              className="absolute left-4 top-4 rounded-full border border-amber-300/30 bg-amber-500/25 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-amber-100 backdrop-blur-md"
+            >
+              Freelance
+            </span>
+          )}
 
           {project.featured && (
             <span

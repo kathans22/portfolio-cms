@@ -86,7 +86,7 @@ export default function ProjectsManager() {
     reset({
       title: '', slug: '', summary: '', description: '', contentBlocks: [],
       techStack: [], domains: [], role: '', liveUrl: '', repoUrl: '', coverImageUrl: '',
-      gallery: [], featured: false, order: 0, status: 'PUBLISHED',
+      gallery: [], featured: false, isClientProject: false, order: 0, status: 'PUBLISHED',
       metaTitle: '', metaDescription: '', ogImageUrl: '',
     });
     setCurrentModal({ mode: 'add' });
@@ -150,7 +150,7 @@ export default function ProjectsManager() {
                 <tr key={proj.id} className="border-b border-slate-800 last:border-0 hover:bg-slate-950/20">
                   <td className="p-4 font-bold">{proj.order}</td>
                   <td className="p-4">
-                    {proj.coverImageUrl && <img src={proj.coverImageUrl} alt="" loading="lazy" className="w-12 h-8 object-cover rounded border border-slate-800" />}
+                    {proj.coverImageUrl && <img src={proj.coverImageUrl} referrerPolicy="no-referrer" alt="" loading="lazy" className="w-12 h-8 object-cover rounded border border-slate-800" />}
                   </td>
                   <td className="p-4 font-bold text-white">{proj.title}</td>
                   <td className="p-4 text-xs text-slate-400">{proj.domains.map((d: ProjectDomain) => PROJECT_DOMAIN_META[d]?.label ?? d).join(', ')}</td>
@@ -158,6 +158,7 @@ export default function ProjectsManager() {
                     {proj.status === 'PUBLISHED' ? <span className="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-bold">Published</span> : <span className="bg-slate-800 text-slate-400 text-[10px] px-2 py-0.5 rounded-full font-bold">Draft</span>}
                   </td>
                   <td className="p-4">
+                    {proj.isClientProject && <span className="bg-amber-500/10 text-amber-400 text-[10px] px-2 py-0.5 rounded-full font-bold mr-1">Freelance</span>}
                     {proj.featured ? <span className="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-bold">Featured</span> : <span className="text-slate-500">No</span>}
                   </td>
                   <td className="p-4 text-right">
@@ -247,6 +248,10 @@ export default function ProjectsManager() {
                 <div className="flex items-center gap-2 pt-6">
                   <input id="proj-featured" type="checkbox" {...register('featured')} className="rounded border-slate-800 bg-slate-950" />
                   <label htmlFor="proj-featured" className="text-slate-400 text-xs font-semibold">Featured showcase</label>
+                </div>
+                <div className="flex items-center gap-2 pt-6">
+                  <input id="proj-client" type="checkbox" {...register('isClientProject')} className="rounded border-slate-800 bg-slate-950" />
+                  <label htmlFor="proj-client" className="text-slate-400 text-xs font-semibold">Freelance / client project</label>
                 </div>
               </div>
 

@@ -10,13 +10,16 @@ import { Project } from './project.model';
 
 const router = Router();
 
-// Public (auth-aware): GET /api/v1/projects?featured=&tag=&domain=&page=&limit=
+// Public (auth-aware): GET /api/v1/projects?featured=&clientProject=&tag=&domain=&page=&limit=
 router.get('/', optionalAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const filter: Record<string, unknown> = req.userId ? {} : { status: 'PUBLISHED' };
 
     if (req.query.featured !== undefined) {
       filter.featured = req.query.featured === 'true';
+    }
+    if (req.query.clientProject !== undefined) {
+      filter.isClientProject = req.query.clientProject === 'true';
     }
     if (typeof req.query.tag === 'string') {
       filter.techStack = req.query.tag;

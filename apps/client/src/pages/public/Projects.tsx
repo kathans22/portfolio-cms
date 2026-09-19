@@ -111,10 +111,13 @@ export default function Projects() {
             className="bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-xl overflow-hidden flex flex-col group hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
           >
             <div className="h-48 overflow-hidden relative">
-              <img src={project.coverImageUrl} alt="" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <img src={project.coverImageUrl} referrerPolicy="no-referrer" alt="" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             </div>
             <div className="p-6 flex flex-col flex-grow">
               <div className="flex flex-wrap gap-1.5 mb-3">
+                {project.isClientProject && (
+                  <span className="bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full">Freelance</span>
+                )}
                 {project.domains.map((d) => (
                   <span key={d} className="bg-indigo-100 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full">
                     {PROJECT_DOMAIN_META[d]?.label ?? d}
